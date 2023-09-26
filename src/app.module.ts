@@ -21,6 +21,7 @@ import { ConfigModule, ConfigService} from '@nestjs/config';
       useFactory: (config: ConfigService) => {
         return {
           uri: config.get<string>('DB_URI'),
+          dbName: "fp-ps"
         }
       }
     }),
