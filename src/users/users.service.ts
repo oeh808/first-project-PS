@@ -14,4 +14,29 @@ export class UsersService {
     
         return user.save();
     }
+
+    //TODO: Get Single User
+    findOne() {
+
+    }
+
+    //TODO: Get all Users
+    find() {
+
+    }
+
+    //TODO: Edit User
+    update() {
+
+    }
+
+    //TODO: Reset User Password
+    reset() {
+
+    }
+
+    //TODO: Delete User
+    remove() {
+
+    }
 }
