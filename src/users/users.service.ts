@@ -16,13 +16,13 @@ export class UsersService {
     }
 
     //TODO: Get Single User
-    findOne() {
-
+    findOne(id: number) {
+        return this.userModel.find();
     }
 
     //TODO: Get all Users
-    find() {
-
+    find(name: string) {
+        return this.userModel.find({name: name});
     }
 
     //TODO: Edit User

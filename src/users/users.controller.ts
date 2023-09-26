@@ -15,15 +15,15 @@ export class UsersController {
     }
 
     //TODO:
-    @Get()
+    @Get('/:id')
     getUser() {
 
     }
 
     //TODO:
     @Get()
-    getAllUsers() {
-
+    getAllUsers(@Body() body: CreateUserDto) {
+        return this.usersService.find(body.name);
     }
 
     //TODO:
