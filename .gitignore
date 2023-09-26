@@ -1,5 +1,7 @@
 # .envs
-.env
+.env.mongo
+.env.development
+.env.test
 
 # compiled output
 /dist
