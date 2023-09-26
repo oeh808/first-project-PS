@@ -26,9 +26,9 @@ export class UsersController {
     }
 
     //TODO:
-    @Patch()
-    editUser() {
-
+    @Patch('/:id')
+    updateUser(@Param('id') id: string, @Body() body: CreateUserDto) {
+        return this.usersService.update(parseInt(id), body);
     }
 
     @Patch('/reset/:id')
