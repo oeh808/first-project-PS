@@ -9,6 +9,8 @@ export class UsersService {
     constructor(@InjectModel(User.name) private userModel: Model<User>,
     @InjectConnection() private connection: Connection) {}
 
+    //TODO: Add error handling
+
     async create(userID : number,name: string, email: string, password: string) {
         const user = new this.userModel({userID, name, email, password});
     
@@ -17,11 +19,9 @@ export class UsersService {
 
     // Get Single User
     findOne(id: number) {
-        if (!id){
-            throw new NotFoundException("User not found.");
-        }
+        const user = this.userModel.findOne({userID: id});
 
-        return this.userModel.findOne({userID: id});
+        return user;
     }
 
     //FIXME: Use regex to make search more flexible
@@ -35,15 +35,14 @@ export class UsersService {
     }
 
     //TODO: Reset User Password
-    reset() {
+    reset(id: number) {
+        //const user = this.userModel.findOne({userID: id});
+
 
     }
 
     remove(id: number) {
-        const user = this.userModel.find({userID: id});
-        if (!user){
-            return new NotFoundException("User not found.");
-        }
+        const user = this.userModel.findOne({userID: id});
 
         return user.deleteOne();
     }

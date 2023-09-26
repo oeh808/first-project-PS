@@ -32,7 +32,7 @@ export class UsersController {
     }
 
     //TODO:
-    @Patch()
+    @Patch('/reset/:id')
     resetUserPassword() {
 
     }
