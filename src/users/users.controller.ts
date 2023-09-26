@@ -13,7 +13,7 @@ export class UsersController {
 
         return user;
     }
-    
+
     @Get('/:id')
     getUser(@Param('id') id: string) {
         return this.usersService.findOne(parseInt(id));
@@ -37,10 +37,9 @@ export class UsersController {
 
     }
 
-    //TODO:
-    @Delete()
-    removeUser() {
-
+    @Delete('/:id')
+    removeUser(@Param('id') id: string) {
+        return this.usersService.remove(parseInt(id));
     }
 
 }

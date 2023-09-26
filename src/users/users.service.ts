@@ -39,8 +39,12 @@ export class UsersService {
 
     }
 
-    //TODO: Delete User
-    remove() {
+    remove(id: number) {
+        const user = this.userModel.find({userID: id});
+        if (!user){
+            return new NotFoundException("User not found.");
+        }
 
+        return user.deleteOne();
     }
 }
