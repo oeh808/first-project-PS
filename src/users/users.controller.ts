@@ -19,7 +19,7 @@ export class UsersController {
         return this.usersService.findOne(parseInt(id));
     }
 
-    //TODO:
+    //FIXME: Implement search through email as well
     @Get()
     getAllUsers(@Body() body: CreateUserDto) {
         return this.usersService.find(body.name);
