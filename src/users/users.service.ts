@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import { User } from './user.schema';
 import { Connection, Model } from 'mongoose';
@@ -15,9 +15,13 @@ export class UsersService {
         return user.save();
     }
 
-    //TODO: Get Single User
+    // Get Single User
     findOne(id: number) {
-        return this.userModel.find();
+        if (!id){
+            throw new NotFoundException("User not found.");
+        }
+
+        return this.userModel.findOne({userID: id});
     }
 
     //FIXME: Use regex to make search more flexible
