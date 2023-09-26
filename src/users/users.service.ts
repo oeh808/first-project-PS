@@ -20,7 +20,7 @@ export class UsersService {
         return this.userModel.find();
     }
 
-    //TODO: Get all Users
+    //FIXME: Use regex to make search more flexible
     find(name: string) {
         return this.userModel.find({name: name});
     }
