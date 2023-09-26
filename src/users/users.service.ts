@@ -34,16 +34,15 @@ export class UsersService {
 
     }
 
-    //TODO: Reset User Password
-    reset(id: number) {
-        //const user = this.userModel.findOne({userID: id});
+    reset(id: number, password: string) {
+        const user = this.userModel.findOneAndUpdate({userID: id},{password: password}, {new: true});
 
-
+        return user;
     }
 
     remove(id: number) {
-        const user = this.userModel.findOne({userID: id});
+        const user = this.userModel.findOneAndDelete({userID: id});
 
-        return user.deleteOne();
+        return user;
     }
 }

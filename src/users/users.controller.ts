@@ -31,10 +31,9 @@ export class UsersController {
 
     }
 
-    //TODO:
     @Patch('/reset/:id')
-    resetUserPassword() {
-
+    resetUserPassword(@Param('id') id: string ,@Body() body: CreateUserDto) {
+        return this.usersService.reset(parseInt(id),body.password);
     }
 
     @Delete('/:id')
