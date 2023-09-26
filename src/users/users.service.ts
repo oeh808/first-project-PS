@@ -9,8 +9,8 @@ export class UsersService {
     constructor(@InjectModel(User.name) private userModel: Model<User>,
     @InjectConnection() private connection: Connection) {}
 
-    create(name: string, email: string, password: string) {
-        const user = new this.userModel({name, email, password});
+    async create(userID : number,name: string, email: string, password: string) {
+        const user = new this.userModel({userID, name, email, password});
     
         return user.save();
     }

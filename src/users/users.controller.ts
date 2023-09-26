@@ -9,7 +9,7 @@ export class UsersController {
     //FIXME: Implement a way of authorizing the user before creation
     @Post()
     async createUser(@Body() body: CreateUserDto) {
-        const user = await this.usersService.create(body.name,body.email,body.password);
+        const user = await this.usersService.create(body.userID,body.name,body.email,body.password);
 
         return user;
     }

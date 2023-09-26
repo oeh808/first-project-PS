@@ -3,6 +3,9 @@ import { HydratedDocument } from 'mongoose';
 
 @Schema()
 export class User {
+    @Prop({ required: [true, "User ID required."], unique: true  })
+    userID: number;
+
     @Prop({ required: [true, "Name required."] })
     name: string;
     
