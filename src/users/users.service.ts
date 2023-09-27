@@ -4,13 +4,13 @@ import { User } from './user.schema';
 import { Connection, Model } from 'mongoose';
 import { CreateUserDto } from './create-user.dto';
 
+//TODO: Add error handling and authentication----------------------------------------------------------------------------------------------------------------
 @Injectable()
 export class UsersService {
     constructor(@InjectModel(User.name) private userModel: Model<User>,
     @InjectConnection() private connection: Connection) {}
 
-    //TODO: Add error handling
-
+    // --- CREATE ---
     async create(userID : number,name: string, email: string, password: string) {
         const user = new this.userModel({userID, name, email, password});
     
@@ -18,6 +18,7 @@ export class UsersService {
     }
 
     // Get Single User
+    // --- GET ---
     async findOne(id: number) {
         const user = await this.userModel.findOne({userID: id});
         if (!user){
@@ -28,10 +29,13 @@ export class UsersService {
     }
 
     //FIXME: Use regex to make search more flexible
+    //FIXME: Implement Pagination
+    // --- GET ---
     find(name: string) {
         return this.userModel.find({name: name});
     }
 
+    // --- UPDATE ---
     async update(id: number, attrs: Partial<User>) {
         const user = await this.userModel.findOneAndUpdate({userID: id}, {name: attrs.name, email: attrs.email}, {new: true, runValidators: true});
 
@@ -39,6 +43,7 @@ export class UsersService {
 
     }
 
+    // --- UPDATE ---
     async reset(id: number, password: string) {
         const user = await this.userModel.findOneAndUpdate({userID: id},{password: password}, {new: true});
 
@@ -49,6 +54,7 @@ export class UsersService {
         return user;
     }
 
+    // --- DELETE ---
     async remove(id: number) {
         const user = await this.userModel.findOneAndDelete({userID: id});
 
