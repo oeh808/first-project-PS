@@ -32,7 +32,7 @@ export class CategoriesService {
 
     // --- UPDATE ---
     async update(name: string, attrs: Partial<Category>) {
-        const category = await this.categoryModel.findOneAndUpdate({name: name}, {image: attrs.image, description: attrs.description}, {new: true} );
+        const category = await this.categoryModel.findOneAndUpdate({name: name}, {image: attrs.image, description: attrs.description}, { new: true, runValidators: true } );
         if(!category){
             return new NotFoundException("Category not found.");
         }

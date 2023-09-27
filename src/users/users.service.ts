@@ -54,7 +54,7 @@ export class UsersService {
 
     // --- UPDATE ---
     async reset(id: number, password: string) {
-        const user = await this.userModel.findOneAndUpdate({userID: id},{password: password}, {new: true});
+        const user = await this.userModel.findOneAndUpdate({userID: id},{password: password}, { new: true, runValidators: true });
 
         if(!user){
             return new NotFoundException("User not found");
