@@ -26,14 +26,15 @@ export class UsersController {
         return this.usersService.find(body.name,body.offset,body.limit);
     }
 
-    //TODO:
+    //FIXME: Create UpdateUserDTO needed
     @Patch('/:id')
     updateUser(@Param('id') id: string, @Body() body: CreateUserDto) {
         return this.usersService.update(parseInt(id), body);
     }
 
+    //FIXME: Create UpdateUserDTO needed
     @Patch('/reset/:id')
-    resetUserPassword(@Param('id') id: string ,@Body() body: CreateUserDto) {
+    resetUserPassword(@Param('id') id: string, @Body() body: CreateUserDto) {
         return this.usersService.reset(parseInt(id),body.password);
     }
 
