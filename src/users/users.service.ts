@@ -18,11 +18,13 @@ export class UsersService {
     }
 
     // Get Single User
-    findOne(id: number) {
-        if(!id){
-            return new NotFoundException("User not found.")
+    async findOne(id: number) {
+        const user = await this.userModel.findOne({userID: id});
+        if (!user){
+            return new NotFoundException("User not found");
         }
-        return this.userModel.findOne({userID: id});
+        //console.log(user.name);
+        return user;
     }
 
     //FIXME: Use regex to make search more flexible
@@ -39,11 +41,19 @@ export class UsersService {
     async reset(id: number, password: string) {
         const user = await this.userModel.findOneAndUpdate({userID: id},{password: password}, {new: true});
 
+        if(!user){
+            return new NotFoundException("User not found");
+        }
+
         return user;
     }
 
     async remove(id: number) {
         const user = await this.userModel.findOneAndDelete({userID: id});
+
+        if(!user){
+            return new NotFoundException("User not found");
+        }
 
         return user;
     }
