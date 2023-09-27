@@ -15,11 +15,8 @@ export class UsersService {
     // --- CREATE ---
     async create(userID : number,name: string, email: string, password: string) {
         //TODO: Move password encryption to a middle ware so it can be applied on reset password as well
-        const salt = randomBytes(8).toString('hex');
-        const hash = (await scrypt(password, salt, 32)) as Buffer;
-        const result = salt + '.' + hash.toString('hex');
 
-        const user = new this.userModel({userID, name, email, password: result});
+        const user = new this.userModel({userID, name, email, password});
     
         return user.save();
     }
