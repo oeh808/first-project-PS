@@ -28,11 +28,10 @@ export class UsersService {
         return user;
     }
 
-    //FIXME: Use regex to make search more flexible
     //FIXME: Implement Pagination
     // --- GET ---
     find(name: string) {
-        return this.userModel.find({name: name});
+        return this.userModel.find({ "name" : { $regex: name, $options: 'i' } });
     }
 
     // --- UPDATE ---
