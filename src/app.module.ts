@@ -11,17 +11,17 @@ import { ConfigModule, ConfigService} from '@nestjs/config';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: `.env.mongo`
+      envFilePath: `.env.${process.env.NODE_ENV}`
     }),
     UsersModule, 
-    CategoriesModule, 
+    CategoriesModule,  
     ItemsModule, 
     MongooseModule.forRootAsync({
       inject: [ConfigService],  
       useFactory: (config: ConfigService) => {
         return {
           uri: config.get<string>('DB_URI'),
-          dbName: "fp-ps"
+          dbName: config.get<string>('DB_NAME')
         }
       }
     }),
