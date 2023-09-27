@@ -16,22 +16,38 @@ export class CategoriesService {
     }
 
     // --- GET ---
-    findOne() {
-
+    async findOne(name: string) {
+        const category = await this.categoryModel.find({name: name});
+        if (!category){
+            return new NotFoundException("Category not found.");
+        }
+        
+        return category;
     }
-
+    
+    //TODO:
     find() {
 
     }
 
     // --- UPDATE ---
-    edit() {
+    async update(name: string, attrs: Partial<Category>) {
+        const category = await this.categoryModel.findOneAndUpdate({name: name}, {image: attrs.image, description: attrs.description}, {new: true} );
+        if(!category){
+            return new NotFoundException("Category not found.");
+        }
 
+        return category;
     }
 
     // --- DELETE ---
-    remove() {
+    async remove(name: string) {
+        const category = await this.categoryModel.findOneAndDelete({name: name});
+        if (!category){
+            return new NotFoundException("Category not found.");
+        }
         
+        return category;
     }
 
 }

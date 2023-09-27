@@ -14,23 +14,24 @@ export class CategoriesController {
     }
 
     @Get('/:name')
-    getCategory() {
-
+    getCategory(@Param('name') name: string) {
+        return this.categoryService.findOne(name);
     }
 
+    //TODO: 
     @Get()
     getAllCategories() {
 
     }
 
     @Patch('/:name')
-    editCategory() {
-
+    editCategory(@Param('name') name: string, @Body() body: CreateCategoryDto) {
+        return this.categoryService.update(name, body);
     }
 
     @Delete('/:name')
-    removeCategory() {
-
+    removeCategory(@Param('name') name: string) {
+        return this.categoryService.remove(name);
     }
 
 }
