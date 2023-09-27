@@ -10,8 +10,7 @@ const scrypt = promisify(_scrypt);
 //TODO: Add error handling and authentication----------------------------------------------------------------------------------------------------------------
 @Injectable()
 export class UsersService {
-    constructor(@InjectModel(User.name) private userModel: Model<User>,
-    @InjectConnection() private connection: Connection) {}
+    constructor(@InjectModel(User.name) private userModel: Model<User>) {}
 
     // --- CREATE ---
     async create(userID : number,name: string, email: string, password: string) {
