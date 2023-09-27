@@ -3,6 +3,9 @@ import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import { User } from './user.schema';
 import { Connection, Model } from 'mongoose';
 import { CreateUserDto } from './dtos/create-user.dto';
+import { randomBytes, scrypt as _scrypt } from 'crypto';
+import { promisify } from 'util';
+const scrypt = promisify(_scrypt);
 
 //TODO: Add error handling and authentication----------------------------------------------------------------------------------------------------------------
 @Injectable()
@@ -12,7 +15,11 @@ export class UsersService {
 
     // --- CREATE ---
     async create(userID : number,name: string, email: string, password: string) {
-        const user = new this.userModel({userID, name, email, password});
+        const salt = randomBytes(8).toString('hex');
+        const hash = (await scrypt(password, salt, 32)) as Buffer;
+        const result = salt + '.' + hash.toString('hex');
+
+        const user = new this.userModel({userID, name, email, password: result});
     
         return user.save();
     }
