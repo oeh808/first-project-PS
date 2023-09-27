@@ -28,7 +28,6 @@ export class UsersService {
         return user;
     }
 
-    //FIXME: Implement Pagination
     // --- GET ---
     find(name: string, offset: number, limit: number) {
         return this.userModel.find({ "name" : { $regex: name, $options: 'i' } }).skip(offset).limit(limit);
@@ -36,8 +35,11 @@ export class UsersService {
 
     // --- UPDATE ---
     async update(id: number, attrs: Partial<User>) {
-        // Build the query before execueting to implemented filters and other features
         const user = await this.userModel.findOneAndUpdate({userID: id}, {name: attrs.name, email: attrs.email}, {new: true, runValidators: true});
+
+        if (!user){
+            return new NotFoundException("User not found");
+        }
 
         return user;
 
