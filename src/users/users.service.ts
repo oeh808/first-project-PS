@@ -23,7 +23,7 @@ export class UsersService {
         if (!user){
             return new NotFoundException("User not found");
         }
-        //console.log(user.name);
+
         return user;
     }
 
@@ -32,9 +32,10 @@ export class UsersService {
         return this.userModel.find({name: name});
     }
 
-    //TODO: Edit User
     async update(id: number, attrs: Partial<User>) {
-        const user = await this.userModel.findOne({userId: id});
+        const user = await this.userModel.findOneAndUpdate({userID: id}, {name: attrs.name, email: attrs.email}, {new: true, runValidators: true});
+
+        return user;
 
     }
 
