@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import { User } from './user.schema';
 import { Connection, Model } from 'mongoose';
-import { CreateUserDto } from './create-user.dto';
+import { CreateUserDto } from './dtos/create-user.dto';
 
 //TODO: Add error handling and authentication----------------------------------------------------------------------------------------------------------------
 @Injectable()
@@ -30,8 +30,8 @@ export class UsersService {
 
     //FIXME: Implement Pagination
     // --- GET ---
-    find(name: string) {
-        return this.userModel.find({ "name" : { $regex: name, $options: 'i' } });
+    find(name: string, offset: number, limit: number) {
+        return this.userModel.find({ "name" : { $regex: name, $options: 'i' } }).skip(offset).limit(limit);
     }
 
     // --- UPDATE ---
