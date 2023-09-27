@@ -1,6 +1,7 @@
 import { Body, Controller, Post, Session, Get, Patch, Delete, Param, Query } from '@nestjs/common';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UsersService } from './users.service';
+import { SearchUserDto } from './dtos/search-user.dto';
 
 @Controller('users')
 export class UsersController {
@@ -21,8 +22,8 @@ export class UsersController {
 
     //FIXME: Implement search through email as well
     @Get()
-    getAllUsers(@Body() body: CreateUserDto, @Query() query) {
-        return this.usersService.find(body.name,query);
+    getAllUsers(@Body() body: SearchUserDto) {
+        return this.usersService.find(body.name,body.offset,body.limit);
     }
 
     //TODO:
