@@ -20,7 +20,7 @@ export class UsersService {
     // Get Single User
     // --- GET ---
     async findOne(id: number) {
-        const user = await this.userModel.findOne({userID: id}).select('-password');
+        const user = await this.userModel.findOne({userID: id});
         if (!user){
             return new NotFoundException("User not found");
         }
@@ -31,13 +31,13 @@ export class UsersService {
     //FIXME: Implement Pagination
     // --- GET ---
     find(name: string) {
-        return this.userModel.find({ "name" : { $regex: name, $options: 'i' } }).select('-password');
+        return this.userModel.find({ "name" : { $regex: name, $options: 'i' } });
     }
 
     // --- UPDATE ---
     async update(id: number, attrs: Partial<User>) {
         // Build the query before execueting to implemented filters and other features
-        const user = await this.userModel.findOneAndUpdate({userID: id}, {name: attrs.name, email: attrs.email}, {new: true, runValidators: true}).select('-password');
+        const user = await this.userModel.findOneAndUpdate({userID: id}, {name: attrs.name, email: attrs.email}, {new: true, runValidators: true});
 
         return user;
 
