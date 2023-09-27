@@ -3,7 +3,7 @@ import { HydratedDocument } from 'mongoose';
 
 @Schema()
 export class Category {
-    @Prop({ required: [true, "Category must have a name."], trim: true })
+    @Prop({ required: [true, "Category must have a name."], unique: true, trim: true })
     name: string;
     
     @Prop({ required: [true, "Category must have an image"], trim: true  })
