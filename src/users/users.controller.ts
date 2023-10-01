@@ -46,7 +46,6 @@ export class UsersController {
         return this.usersService.update(parseInt(id), body);
     }
 
-    //FIXME: Create UpdateUserDTO needed
     @Patch('/reset/:id')
     resetUserPassword(@Param('id') id: string, @Body() body: ResetUserPasswordDto) {
         return this.usersService.reset(parseInt(id),body.password);
