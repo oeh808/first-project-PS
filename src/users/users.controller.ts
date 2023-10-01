@@ -4,18 +4,30 @@ import { UsersService } from './users.service';
 import { SearchUserDto } from './dtos/search-user.dto';
 import { EditUserDto } from './dtos/update-user.dto';
 import { ResetUserPasswordDto } from './dtos/reset-password.dto';
+import { Jwt } from 'jsonwebtoken';
+import { AuthService } from './auth.service';
+import { LoginUserDto } from './dtos/login-user.dto';
 
 @Controller('users')
 export class UsersController {
-    constructor (private usersService: UsersService) {}
+    constructor (private usersService: UsersService, private authService: AuthService) {}
     // --- Super Admin ---
     //FIXME: Implement a way of authorizing the user before creation
     @Post()
     async createUser(@Body() body: CreateUserDto) {
-        const user = await this.usersService.create(body.userID,body.name,body.email,body.password);
+        // const user = await this.usersService.create(body.userID,body.name,body.email,body.password);
+
+        // return user;
+        return this.authService.signUp(body.userID,body.name,body.email,body.password);
+    }
+
+    @Post('/signin')
+    async signIn(@Body() body: LoginUserDto) {
+        const user = await this.authService.signIn(body.email, body.password);
 
         return user;
     }
+
 
     @Get('/:id')
     getUser(@Param('id') id: string) {
