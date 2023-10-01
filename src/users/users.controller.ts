@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Session, Get, Patch, Delete, Param, Query } from '@nestjs/common';
+import { Body, Controller, Post, Session, Get, Patch, Delete, Param, Query, UseGuards } from '@nestjs/common';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UsersService } from './users.service';
 import { SearchUserDto } from './dtos/search-user.dto';
@@ -7,6 +7,7 @@ import { ResetUserPasswordDto } from './dtos/reset-password.dto';
 import { Jwt } from 'jsonwebtoken';
 import { AuthService } from './auth.service';
 import { LoginUserDto } from './dtos/login-user.dto';
+import { JwtAuthGuard } from './jwt-auth.guard';
 
 @Controller('users')
 export class UsersController {
@@ -28,7 +29,7 @@ export class UsersController {
         return user;
     }
 
-
+    @UseGuards(JwtAuthGuard)
     @Get('/:id')
     getUser(@Param('id') id: string) {
         return this.usersService.findOne(parseInt(id));

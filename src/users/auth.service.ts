@@ -31,7 +31,7 @@ export class AuthService {
             throw new BadRequestException("Incorrect Email or Password")
         }
 
-        const token = await this.jwtService.signAsync({ id: user.userID });
+        const token = await this.jwtService.signAsync({ id: user.userID, name: user.name });
 
         return token;
     }
