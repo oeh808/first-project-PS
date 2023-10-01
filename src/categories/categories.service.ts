@@ -25,12 +25,12 @@ export class CategoriesService {
         return category;
     }
     
-    //TODO:
-    find() {
-
+    find(name: string, offset: number, limit: number) {
+        return this.categoryModel.find({ "name" : { $regex: name, $options: 'i' } }).skip(offset).limit(limit);
     }
 
     // --- UPDATE ---
+    //FIXME: Currently needs name in body and params
     async update(name: string, attrs: Partial<Category>) {
         const category = await this.categoryModel.findOneAndUpdate({name: name}, {image: attrs.image, description: attrs.description}, { new: true, runValidators: true } );
         if(!category){

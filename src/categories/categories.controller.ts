@@ -1,6 +1,8 @@
 import { Body, Controller, Post, Session, Get, Patch, Delete, Param, Query } from '@nestjs/common';
 import { CategoriesService } from './categories.service';
 import { CreateCategoryDto } from './dtos/create-category.dto';
+import { SearchCategoryDto } from './dtos/search-category.dto';
+import { UpdateCategoryDto } from './dtos/update-category.dto';
 
 @Controller('categories')
 export class CategoriesController {
@@ -18,14 +20,13 @@ export class CategoriesController {
         return this.categoryService.findOne(name);
     }
 
-    //TODO: 
     @Get()
-    getAllCategories() {
-
+    getAllCategories(@Body() body: SearchCategoryDto) {
+        return this.categoryService.find(body.name, body.offset, body.limit);
     }
 
     @Patch('/:name')
-    editCategory(@Param('name') name: string, @Body() body: CreateCategoryDto) {
+    editCategory(@Param('name') name: string, @Body() body: UpdateCategoryDto) {
         return this.categoryService.update(name, body);
     }
 
