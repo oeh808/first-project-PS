@@ -34,6 +34,11 @@ export class UsersService {
     }
 
     // --- GET ---
+    findOneByEmail(email: string){
+        return this.userModel.findOne({ email: email });
+    }
+
+    // --- GET ---
     find(name: string, offset: number, limit: number) {
         // Error handling for user not found unnecessary here due to returning an array
         return this.userModel.find({ "name" : { $regex: name, $options: 'i' } }).skip(offset).limit(limit);
