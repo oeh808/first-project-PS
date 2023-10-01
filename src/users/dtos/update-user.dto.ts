@@ -1,6 +1,6 @@
 import { IsEmail, IsString, IsOptional, IsNumber } from "class-validator";
 
-export class SearchUserDto {
+export class EditUserDto {
     @IsNumber()
     @IsOptional()
     userID: number;
@@ -12,10 +12,4 @@ export class SearchUserDto {
     @IsEmail()
     @IsOptional()
     email: string;
-
-    @IsNumber()
-    offset: number;
-
-    @IsNumber()
-    limit: number;
 }

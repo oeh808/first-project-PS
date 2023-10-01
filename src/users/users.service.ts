@@ -2,7 +2,6 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import { User } from './user.schema';
 import { Connection, Model } from 'mongoose';
-import { CreateUserDto } from './dtos/create-user.dto';
 import { randomBytes, scrypt as _scrypt } from 'crypto';
 import { promisify } from 'util';
 const scrypt = promisify(_scrypt);
@@ -14,7 +13,9 @@ export class UsersService {
 
     // --- CREATE ---
     async create(userID : number,name: string, email: string, password: string) {
-        //TODO: Move password encryption to a middle ware so it can be applied on reset password as well
+        const salt = randomBytes(8).toString('hex');
+        const hash = (await scrypt(password, salt, 32)) as Buffer;
+        password = salt + '.' + hash.toString('hex');
 
         const user = new this.userModel({userID, name, email, password});
     
@@ -39,6 +40,7 @@ export class UsersService {
     }
 
     // --- UPDATE ---
+    // Updates any part of the user except the password
     async update(id: number, attrs: Partial<User>) {
         const user = await this.userModel.findOneAndUpdate({userID: id}, {name: attrs.name, email: attrs.email}, {new: true, runValidators: true});
 
@@ -51,8 +53,11 @@ export class UsersService {
     }
 
     // --- UPDATE ---
-    //TODO: Implement password hashing
     async reset(id: number, password: string) {
+        const salt = randomBytes(8).toString('hex');
+        const hash = (await scrypt(password, salt, 32)) as Buffer;
+        password = salt + '.' + hash.toString('hex');
+
         const user = await this.userModel.findOneAndUpdate({userID: id},{password: password}, { new: true, runValidators: true });
 
         if(!user){
