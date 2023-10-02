@@ -1,21 +1,24 @@
 import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Item } from './items.schema';
-import { Model } from 'mongoose';
+import mongoose, { Model, ObjectId } from 'mongoose';
 import { UserRoles } from 'src/users/user-roles.enum';
+import { Category } from 'src/categories/categories.schema';
+import { CreateItemDto } from './dtos/create-item.dto';
 
 @Injectable()
 export class ItemsService {
-    constructor(@InjectModel(Item.name) private itemModel: Model<Item>) {}
+    constructor(@InjectModel(Item.name) private itemModel: Model<Item>, @InjectModel(Category.name) private categoryModel: Model<Category>) {}
 
-    async create(sku: number, name: string, image: string, description: string, categories: string[],  header: string) {
+    async create(dto: CreateItemDto,  header: string) {
+        console.log(dto.categories);
         const role = await this.extractRole(header);
         //console.log(UserRoles.EDITOR.toString());
         if( role != UserRoles.ADMIN.toString() && role != UserRoles.EDITOR.toString()){
             throw new UnauthorizedException("You do not have permission to do that.");
         }
 
-        const item = new this.itemModel({SKU: sku, name: name, image: image, description: description, categories: categories});
+        const item = new this.itemModel({...dto});
 
         return item.save();
     }
@@ -26,7 +29,7 @@ export class ItemsService {
             throw new UnauthorizedException("You do not have permission to do that.");
         }
 
-        const item = await this.itemModel.findOne({SKU: SKU});
+        const item = await this.itemModel.findOne({SKU: SKU}).populate({path: 'categories'});
 
         if (!item){
             throw new NotFoundException("Item not found.");
