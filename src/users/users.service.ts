@@ -110,16 +110,16 @@ export class UsersService {
 
     // --- Function that gets the jwt token bearer's role
     async extractRole(token: string) {
+        //console.log(token);
         const temp = atob(token.split('.')[1]);
-        const id = temp.split(',')[0].slice(-1);
-        const user = await this.userModel.findOne({userID: id});
+        const role = temp.split(',')[1].slice(-2).charAt(0)
 
-        return user.role;
+        return role;
     }
 
     // --- Function that checks if the user is a superadmin given a token
     async isAllowed(token: string) {
         const role = await this.extractRole(token);
-        return role == UserRoles.SUPERADMIN;
+        return role == UserRoles.SUPERADMIN.toString();
     }
 }

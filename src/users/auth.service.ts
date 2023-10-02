@@ -11,7 +11,7 @@ export class AuthService {
 
     async signUp(userID: number, name: string, email: string, password: string, header: string) {
         const user = await this.usersService.create(userID, name, email, password, header);
-        const token = await this.jwtService.signAsync({ id: user.userID });
+        const token = await this.jwtService.signAsync({ id: user.userID, role: user.role });
         // console.log(token);
 
         return [user, token];
@@ -31,8 +31,22 @@ export class AuthService {
             throw new BadRequestException("Incorrect Email or Password")
         }
 
-        const token = await this.jwtService.signAsync({ id: user.userID, name: user.name });
+        const token = await this.jwtService.signAsync({ id: user.userID, role: user.role  });
 
         return token;
     }
 }
+
+// export function extractRole(token: string) {
+//     //console.log(token);
+//     const temp = atob(token.split('.')[1]);
+//     const role = temp.split(',')[1].slice(-2).charAt(0)
+
+//     return role;
+// }
+
+// // --- Function that checks if the user is a superadmin given a token
+// export async function isAllowed(token: string, expectedRole: string) {
+//     const role = await this.extractRole(token);
+//     return role == expectedRole;
+// }
