@@ -9,8 +9,8 @@ const scrypt = promisify(_scrypt);
 export class AuthService {
     constructor(private jwtService: JwtService, private usersService: UsersService) {}
 
-    async signUp(userID: number, name: string, email: string, password: string) {
-        const user = await this.usersService.create(userID, name, email, password);
+    async signUp(userID: number, name: string, email: string, password: string, header: string) {
+        const user = await this.usersService.create(userID, name, email, password, header);
         const token = await this.jwtService.signAsync({ id: user.userID });
         // console.log(token);
 

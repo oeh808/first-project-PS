@@ -1,18 +1,23 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import { User } from './user.schema';
 import { Connection, Model } from 'mongoose';
 import { randomBytes, scrypt as _scrypt } from 'crypto';
 import { promisify } from 'util';
 const scrypt = promisify(_scrypt);
+import { UserRoles } from './user-roles.enum';
 
-//TODO: Add error handling and authentication----------------------------------------------------------------------------------------------------------------
+//TODO: Add error handling ----------------------------------------------------------------------------------------------------------------
 @Injectable()
 export class UsersService {
     constructor(@InjectModel(User.name) private userModel: Model<User>) {}
 
     // --- CREATE ---
-    async create(userID : number,name: string, email: string, password: string) {
+    async create(userID : number,name: string, email: string, password: string, header: string) {
+        if (! await this.isAllowed(header)){
+            throw new UnauthorizedException("You do not have permission to do that.");
+        }
+
         const salt = randomBytes(8).toString('hex');
         const hash = (await scrypt(password, salt, 32)) as Buffer;
         password = salt + '.' + hash.toString('hex');
@@ -81,5 +86,20 @@ export class UsersService {
         }
 
         return user;
+    }
+
+    // --- Function that gets the jwt token bearer's role
+    async extractRole(token: string) {
+        const temp = atob(token.split('.')[1]);
+        const id = temp.split(',')[0].slice(-1);
+        const user = await this.userModel.findOne({userID: id});
+
+        return user.role;
+    }
+
+    // --- Function that checks if the user is a superadmin given a token
+    async isAllowed(token: string) {
+        const role = await this.extractRole(token);
+        return role === UserRoles.SUPERADMIN;
     }
 }

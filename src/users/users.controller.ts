@@ -16,11 +16,11 @@ export class UsersController {
     // --- Super Admin ---
     //FIXME: Implement a way of authorizing the user before creation
     @Post()
-    async createUser(@Body() body: CreateUserDto) {
+    async createUser(@Body() body: CreateUserDto, @Headers('authorization') header: string) {
         // const user = await this.usersService.create(body.userID,body.name,body.email,body.password);
 
         // return user; 
-        return this.authService.signUp(body.userID,body.name,body.email,body.password);
+        return this.authService.signUp(body.userID,body.name,body.email,body.password, header);
     }
 
     @Public() 
