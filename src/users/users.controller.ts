@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Session, Get, Patch, Delete, Param, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Post, Session, Get, Patch, Delete, Param, Query, UseGuards, Headers } from '@nestjs/common';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UsersService } from './users.service';
 import { SearchUserDto } from './dtos/search-user.dto';
@@ -8,6 +8,7 @@ import { Jwt } from 'jsonwebtoken';
 import { AuthService } from './auth.service';
 import { LoginUserDto } from './dtos/login-user.dto';
 import { JwtAuthGuard } from './jwt-auth.guard';
+import { Public } from 'src/decorators/public.decorator';
 
 @Controller('users')
 export class UsersController {
@@ -18,10 +19,11 @@ export class UsersController {
     async createUser(@Body() body: CreateUserDto) {
         // const user = await this.usersService.create(body.userID,body.name,body.email,body.password);
 
-        // return user;
+        // return user; 
         return this.authService.signUp(body.userID,body.name,body.email,body.password);
     }
 
+    @Public() 
     @Post('/signin')
     async signIn(@Body() body: LoginUserDto) {
         const user = await this.authService.signIn(body.email, body.password);
@@ -29,7 +31,6 @@ export class UsersController {
         return user;
     }
 
-    @UseGuards(JwtAuthGuard)
     @Get('/:id')
     getUser(@Param('id') id: string) {
         return this.usersService.findOne(parseInt(id));

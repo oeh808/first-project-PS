@@ -6,7 +6,8 @@ import { ItemsModule } from './items/items.module';
 import { CategoriesModule } from './categories/categories.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService} from '@nestjs/config';
-import { APP_PIPE } from '@nestjs/core';
+import { APP_GUARD, APP_PIPE } from '@nestjs/core';
+import { JwtAuthGuard } from './users/jwt-auth.guard';
 
 @Module({
   imports: [
@@ -36,7 +37,11 @@ import { APP_PIPE } from '@nestjs/core';
       useValue: new ValidationPipe({
         whitelist: true,
       })
-    }
+    },
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
   ],
 })
 export class AppModule {}
