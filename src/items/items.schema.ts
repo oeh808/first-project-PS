@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Types } from 'mongoose';
+import mongoose, { HydratedDocument, Types } from 'mongoose';
 
 @Schema()
 export class Item {
@@ -16,8 +16,14 @@ export class Item {
     @Prop({ required: [true, "Item must have a description."], trim: true })
     description: string;
 
-    @Prop({type: Types.ObjectId, default: []})
-    categories: { type: Types.ObjectId; ref: 'Category' }
+    @Prop()
+    categories: [
+        {
+            type: mongoose.Types.ObjectId,
+            ref: "categories"
+        }
+    ]
+    //categories: {type: mongoose.Schema.Types.ObjectId[], ref: "categories"}
 }
 
 export type itemDocument = HydratedDocument<Item>;

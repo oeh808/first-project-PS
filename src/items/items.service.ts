@@ -11,9 +11,9 @@ export class ItemsService {
     constructor(@InjectModel(Item.name) private itemModel: Model<Item>, @InjectModel(Category.name) private categoryModel: Model<Category>) {}
 
     async create(dto: CreateItemDto,  header: string) {
-        console.log(dto.categories);
+        dto.categories = dto.categories.map(s => new mongoose.Types.ObjectId(s));
+        
         const role = await this.extractRole(header);
-        //console.log(UserRoles.EDITOR.toString());
         if( role != UserRoles.ADMIN.toString() && role != UserRoles.EDITOR.toString()){
             throw new UnauthorizedException("You do not have permission to do that.");
         }
@@ -29,7 +29,7 @@ export class ItemsService {
             throw new UnauthorizedException("You do not have permission to do that.");
         }
 
-        const item = await this.itemModel.findOne({SKU: SKU}).populate({path: 'categories'});
+        const item = await this.itemModel.findOne({SKU: SKU}).populate({path: 'categories', model: this.categoryModel});
 
         if (!item){
             throw new NotFoundException("Item not found.");
@@ -39,17 +39,27 @@ export class ItemsService {
     }
 
     async find(categories: string[], header: string) {
+        // Assume front end will send the object id for category filtering
         const role = await this.extractRole(header);
         if( role != UserRoles.ADMIN.toString() && role != UserRoles.EDITOR.toString()){
             throw new UnauthorizedException("You do not have permission to do that.");
         }
 
-        // const items = await this.itemModel.find({
-        //     categories: {$elemMatch: {categories}}
-        // }).populate({
-        //     path: categories,
-        //     select: "" 
-        // });
+        // const temp = await this.categoryModel.find({name: {"$in" : categories}});
+        // console.log(await this.itemModel.find().populate({path: 'categories', model: this.categoryModel}));
+        // console.log(temp);
+
+        // const items = await this.itemModel.find().populate({path: 'categories', model: this.categoryModel}).find({categories: {"$in" : temp}});
+        // //console.log(await this.itemModel.find().populate({path: 'categories', model: this.categoryModel}));
+
+        // return items;
+
+        // // const items = await this.itemModel.find({
+        // //     categories: {$elemMatch: {categories}}
+        // // }).populate({
+        // //     path: categories,
+        // //     select: "" 
+        // // });
 
     }
 
@@ -95,5 +105,12 @@ export class ItemsService {
     async isAllowed(token: string, expectedRole: string) {
         const role = await this.extractRole(token);
         return role == expectedRole;
+    }
+
+    // Transforming into ObjectId
+    castToObjectId(id: string) {
+        const newId = new mongoose.Types.ObjectId(id);
+
+        return newId;
     }
 }

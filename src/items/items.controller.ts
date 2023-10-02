@@ -3,6 +3,7 @@ import { ItemsService } from './items.service';
 import { CategoriesService } from 'src/categories/categories.service';
 import { CreateItemDto } from './dtos/create-item.dto';
 import { EditItemDto } from './dtos/edit-item.dto';
+import { SearchItemDto } from './dtos/search-item.dto';
 
 @Controller('items')
 export class ItemsController {
@@ -10,7 +11,8 @@ export class ItemsController {
 
     @Post()
     createItem(@Body() body: CreateItemDto, @Headers('authorization') header: string) {
-        return this.itemService.create(body.SKU, body.name, body.image, body.description, body.categories, header);
+        console.log({...body});
+        return this.itemService.create({...body}, header);
     }
 
     @Get('/:sku')
@@ -18,9 +20,9 @@ export class ItemsController {
         return this.itemService.findOne(parseInt(SKU), header);
     }
 
-    @Get()
-    getAllItems() {
-
+    @Post('/search')
+    getAllItems(@Body() body: SearchItemDto, @Headers('authorization') header: string) {
+        return this.itemService.find(body.categories,header);
     }
 
     @Patch('/:sku')

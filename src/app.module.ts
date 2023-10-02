@@ -8,6 +8,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService} from '@nestjs/config';
 import { APP_GUARD, APP_PIPE } from '@nestjs/core';
 import { JwtAuthGuard } from './users/jwt-auth.guard';
+import 'reflect-metadata';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { JwtAuthGuard } from './users/jwt-auth.guard';
       provide: APP_PIPE,
       useValue: new ValidationPipe({
         whitelist: true,
+        transform: true
       })
     },
     {
