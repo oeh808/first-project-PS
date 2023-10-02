@@ -16,7 +16,7 @@ export class Item {
     @Prop({ required: [true, "Item must have a description."], trim: true })
     description: string;
 
-    @Prop()
+    @Prop({type: Types.ObjectId, default: []})
     categories: { type: Types.ObjectId; ref: 'Category' }
 }
 
