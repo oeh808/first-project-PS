@@ -32,29 +32,29 @@ export class UsersController {
     }
 
     @Get('/:id')
-    getUser(@Param('id') id: string) {
-        return this.usersService.findOne(parseInt(id));
+    getUser(@Param('id') id: string, @Headers('authorization') header: string) {
+        return this.usersService.findOne(parseInt(id), header);
     }
 
     //FIXME: Implement search through email as well
     @Get()
-    getAllUsers(@Body() body: SearchUserDto) {
-        return this.usersService.find(body.name,body.offset,body.limit);
+    getAllUsers(@Body() body: SearchUserDto, @Headers('authorization') header: string) {
+        return this.usersService.find(body.name,body.offset,body.limit, header);
     }
 
     @Patch('/:id')
-    updateUser(@Param('id') id: string, @Body() body: EditUserDto) {
-        return this.usersService.update(parseInt(id), body);
+    updateUser(@Param('id') id: string, @Body() body: EditUserDto, @Headers('authorization') header: string) {
+        return this.usersService.update(parseInt(id), body, header);
     }
 
     @Patch('/reset/:id')
-    resetUserPassword(@Param('id') id: string, @Body() body: ResetUserPasswordDto) {
-        return this.usersService.reset(parseInt(id),body.password);
+    resetUserPassword(@Param('id') id: string, @Body() body: ResetUserPasswordDto, @Headers('authorization') header: string) {
+        return this.usersService.reset(parseInt(id),body.password, header);
     }
 
     @Delete('/:id')
-    removeUser(@Param('id') id: string) {
-        return this.usersService.remove(parseInt(id));
+    removeUser(@Param('id') id: string, @Headers('authorization') header: string) {
+        return this.usersService.remove(parseInt(id), header);
     }
 
 }

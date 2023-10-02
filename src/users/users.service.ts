@@ -29,7 +29,11 @@ export class UsersService {
 
     // Get Single User
     // --- GET ---
-    async findOne(id: number) {
+    async findOne(id: number, header: string) {
+        if (! await this.isAllowed(header)){
+            throw new UnauthorizedException("You do not have permission to do that.");
+        }
+
         const user = await this.userModel.findOne({userID: id});
         if (!user){
             return new NotFoundException("User not found");
@@ -39,19 +43,27 @@ export class UsersService {
     }
 
     // --- GET ---
-    findOneByEmail(email: string){
+    findOneByEmail(email: string){ 
         return this.userModel.findOne({ email: email });
     }
 
     // --- GET ---
-    find(name: string, offset: number, limit: number) {
+    async find(name: string, offset: number, limit: number, header: string) {
+        if (! await this.isAllowed(header)){
+            throw new UnauthorizedException("You do not have permission to do that.");
+        }
+
         // Error handling for user not found unnecessary here due to returning an array
         return this.userModel.find({ "name" : { $regex: name, $options: 'i' } }).skip(offset).limit(limit);
     }
 
     // --- UPDATE ---
     // Updates any part of the user except the password
-    async update(id: number, attrs: Partial<User>) {
+    async update(id: number, attrs: Partial<User>, header: string) {
+        if (! await this.isAllowed(header)){
+            throw new UnauthorizedException("You do not have permission to do that.");
+        }
+
         const user = await this.userModel.findOneAndUpdate({userID: id}, {name: attrs.name, email: attrs.email}, {new: true, runValidators: true});
 
         if (!user){
@@ -63,7 +75,11 @@ export class UsersService {
     }
 
     // --- UPDATE ---
-    async reset(id: number, password: string) {
+    async reset(id: number, password: string, header: string) {
+        if (! await this.isAllowed(header)){
+            throw new UnauthorizedException("You do not have permission to do that.");
+        }
+
         const salt = randomBytes(8).toString('hex');
         const hash = (await scrypt(password, salt, 32)) as Buffer;
         password = salt + '.' + hash.toString('hex');
@@ -78,7 +94,11 @@ export class UsersService {
     }
 
     // --- DELETE ---
-    async remove(id: number) {
+    async remove(id: number, header: string) {
+        if (! await this.isAllowed(header)){
+            throw new UnauthorizedException("You do not have permission to do that.");
+        }
+
         const user = await this.userModel.findOneAndDelete({userID: id});
 
         if(!user){
@@ -100,6 +120,6 @@ export class UsersService {
     // --- Function that checks if the user is a superadmin given a token
     async isAllowed(token: string) {
         const role = await this.extractRole(token);
-        return role === UserRoles.SUPERADMIN;
+        return role == UserRoles.SUPERADMIN;
     }
 }
