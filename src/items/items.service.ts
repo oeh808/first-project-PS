@@ -67,6 +67,9 @@ export class ItemsService {
                     }
                 }
             },
+            {
+                $sort: {SKU: 1}
+            }
             // {
             //     $lookup: {
             //         from: "categories",
@@ -76,7 +79,7 @@ export class ItemsService {
             // }
         ]);
 
-        await this.itemModel.populate(test,{path: 'categories', model: this.categoryModel})
+        await this.itemModel.populate(test,{path: 'categories', model: this.categoryModel});
 
         return test;
 
