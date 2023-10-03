@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Session, Get, Patch, Delete, Param, Query, UseGuards, Headers, BadRequestException } from '@nestjs/common';
+import { Body, Controller, Post, Session, Get, Patch, Delete, Param, Query, UseGuards, Headers, BadRequestException, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { ItemsService } from './items.service';
 import { CategoriesService } from 'src/categories/categories.service';
 import { CreateItemDto } from './dtos/create-item.dto';
@@ -6,6 +6,10 @@ import { EditItemDto } from './dtos/edit-item.dto';
 import { SearchItemDto } from './dtos/search-item.dto';
 import { AddCategoriesDto } from './dtos/add-categories.dto';
 import { FormDataRequest } from 'nestjs-form-data';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { UploadItemImageDto } from './dtos/upload-item-image.dto';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
 
 @Controller('items')
 export class ItemsController {
@@ -19,6 +23,24 @@ export class ItemsController {
         }catch(error){
             throw new BadRequestException(`Item with SKU: ${body.SKU} already exists.`);
         }
+    }
+
+    @Post('upload')
+    @UseInterceptors(FileInterceptor('image', {
+        storage: diskStorage({
+          destination: './misc'
+          , filename: (req, image, cb) => {
+            cb(null, image.originalname)
+            // Generating a 32 random chars long string
+            // const randomName = Array(32).fill(null).map(() => (Math.round(Math.random() * 16)).toString(16)).join('')
+            //Calling the callback passing the random name generated with the original extension name
+            // cb(null, `${randomName}${extname(image.originalname)}`)
+          }
+        })
+      }))
+    uploadFile(@UploadedFile() image: Express.Multer.File) {
+      console.log(image);
+      return image;
     }
 
     @Get('/:sku')

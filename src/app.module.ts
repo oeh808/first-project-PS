@@ -36,11 +36,11 @@ import { MemoryStoredFile, NestjsFormDataModule } from 'nestjs-form-data';
         }
       }
     }),
-    MulterModule.registerAsync({
-      useFactory: () => ({
-        dest: './upload',
-      }),
-    })
+    // MulterModule.registerAsync({
+    //   useFactory: () => ({
+    //     dest: './misc',
+    //   }),
+    // })
   ],
   controllers: [AppController],
   providers: [
