@@ -4,6 +4,7 @@ import { Category } from './categories.schema';
 import { Model } from 'mongoose';
 import { UserRoles } from 'src/users/user-roles.enum';
 import { UpdateCategoryDto } from './dtos/update-category.dto';
+import { CreateCategoryDto } from './dtos/create-category.dto';
 
 
 @Injectable()
@@ -11,12 +12,12 @@ export class CategoriesService {
     constructor(@InjectModel(Category.name) private categoryModel: Model<Category>) {}
 
     // --- CREATE ---
-    async create(name: string, image: string, description: string, header: string) {
+    async create(dto: CreateCategoryDto, header: string) {
         if(! await this.isAllowed(header, UserRoles.ADMIN.toString())){
             throw new UnauthorizedException("You do not have permission to do that.");
         }
 
-        const category = new this.categoryModel({name,image,description});
+        const category = new this.categoryModel({...dto});
 
         return category.save();
     }

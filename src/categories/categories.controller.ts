@@ -10,7 +10,7 @@ export class CategoriesController {
 
     @Post()
     async createCategory(@Body() body: CreateCategoryDto, @Headers('authorization') header: string) {
-        const category = await this.categoryService.create(body.name, body.image, body.description, header);
+        const category = await this.categoryService.create({...body}, header);
 
         return category;
     }

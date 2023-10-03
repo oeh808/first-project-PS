@@ -4,6 +4,7 @@ import { CategoriesService } from 'src/categories/categories.service';
 import { CreateItemDto } from './dtos/create-item.dto';
 import { EditItemDto } from './dtos/edit-item.dto';
 import { SearchItemDto } from './dtos/search-item.dto';
+import { AddCategoriesDto } from './dtos/add-categories.dto';
 
 @Controller('items')
 export class ItemsController {
@@ -36,5 +37,8 @@ export class ItemsController {
     }
 
     // Related to Categories
-
+    @Post('/:sku')
+    addCategories(@Param('sku') SKU: string, @Body() body: AddCategoriesDto, @Headers('authorization') header: string) {
+        return this.itemService.addCategories(parseInt(SKU), body.categories, header);
+    }
 }
