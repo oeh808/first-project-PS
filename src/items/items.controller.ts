@@ -5,6 +5,7 @@ import { CreateItemDto } from './dtos/create-item.dto';
 import { EditItemDto } from './dtos/edit-item.dto';
 import { SearchItemDto } from './dtos/search-item.dto';
 import { AddCategoriesDto } from './dtos/add-categories.dto';
+import { FormDataRequest } from 'nestjs-form-data';
 
 @Controller('items')
 export class ItemsController {

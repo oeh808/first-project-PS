@@ -9,9 +9,17 @@ import { ConfigModule, ConfigService} from '@nestjs/config';
 import { APP_GUARD, APP_PIPE } from '@nestjs/core';
 import { JwtAuthGuard } from './users/jwt-auth.guard';
 import 'reflect-metadata';
+import { MulterModule } from '@nestjs/platform-express';
+import { MemoryStoredFile, NestjsFormDataModule } from 'nestjs-form-data';
 
 @Module({
   imports: [
+    NestjsFormDataModule.configAsync({
+      isGlobal: true,
+      useFactory: () => ({
+        storage: MemoryStoredFile
+      })
+    }),
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: `.env.${process.env.NODE_ENV}`
@@ -28,6 +36,11 @@ import 'reflect-metadata';
         }
       }
     }),
+    MulterModule.registerAsync({
+      useFactory: () => ({
+        dest: './upload',
+      }),
+    })
   ],
   controllers: [AppController],
   providers: [
