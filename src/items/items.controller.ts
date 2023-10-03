@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Session, Get, Patch, Delete, Param, Query, UseGuards, Headers } from '@nestjs/common';
+import { Body, Controller, Post, Session, Get, Patch, Delete, Param, Query, UseGuards, Headers, BadRequestException } from '@nestjs/common';
 import { ItemsService } from './items.service';
 import { CategoriesService } from 'src/categories/categories.service';
 import { CreateItemDto } from './dtos/create-item.dto';
@@ -11,9 +11,13 @@ export class ItemsController {
     constructor(private itemService: ItemsService) {}
 
     @Post()
-    createItem(@Body() body: CreateItemDto, @Headers('authorization') header: string) {
+    async createItem(@Body() body: CreateItemDto, @Headers('authorization') header: string) {
         console.log({...body});
-        return this.itemService.create({...body}, header);
+        try {
+            return await this.itemService.create({...body}, header);
+        }catch(error){
+            throw new BadRequestException(`Item with SKU: ${body.SKU} already exists.`);
+        }
     }
 
     @Get('/:sku')
