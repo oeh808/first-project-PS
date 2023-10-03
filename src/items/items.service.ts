@@ -38,28 +38,29 @@ export class ItemsService {
         return item;
     }
 
-    async find(categories: string[], header: string) {
+    async find(categs: any[], header: string) {
         // Assume front end will send the object id for category filtering
         const role = await this.extractRole(header);
         if( role != UserRoles.ADMIN.toString() && role != UserRoles.EDITOR.toString()){
             throw new UnauthorizedException("You do not have permission to do that.");
         }
 
-        // const temp = await this.categoryModel.find({name: {"$in" : categories}});
-        // console.log(await this.itemModel.find().populate({path: 'categories', model: this.categoryModel}));
-        // console.log(temp);
+        categs = categs.map(s => new mongoose.Types.ObjectId(s));
 
-        // const items = await this.itemModel.find().populate({path: 'categories', model: this.categoryModel}).find({categories: {"$in" : temp}});
-        // //console.log(await this.itemModel.find().populate({path: 'categories', model: this.categoryModel}));
+        const test = await this.itemModel.aggregate([
+            // {
+            //     $unwind: "$categories"
+            // },
+            {
+                $match: {
+                    categories: {
+                        $all: categs
+                    }
+                }
+            }
+        ]);
 
-        // return items;
-
-        // // const items = await this.itemModel.find({
-        // //     categories: {$elemMatch: {categories}}
-        // // }).populate({
-        // //     path: categories,
-        // //     select: "" 
-        // // });
+        return test;
 
     }
 
