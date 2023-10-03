@@ -4,5 +4,5 @@ import { ObjectId } from "mongoose";
 
 export class SearchItemDto {
     @IsArray()
-    categories: string[];
+    categories: ObjectId[];
 }
