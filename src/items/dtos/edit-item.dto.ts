@@ -1,4 +1,5 @@
-import { IsEmail, IsString, IsOptional, IsNumber } from "class-validator";
+import { IsEmail, IsString, IsOptional, IsNumber, IsArray } from "class-validator";
+import { ObjectId } from "mongodb";
 
 export class EditItemDto {    
     @IsString()
@@ -12,4 +13,8 @@ export class EditItemDto {
     @IsString()
     @IsOptional()
     description: string;
+
+    @IsArray()
+    @IsOptional()
+    categories: ObjectId[]
 }

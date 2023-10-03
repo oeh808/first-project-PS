@@ -82,17 +82,22 @@ export class ItemsService {
 
     }
 
-    //TODO: Add functionality for adding categories
     async update(SKU: number, dto: EditItemDto , header: string) {
         const role = await this.extractRole(header);
         if( role != UserRoles.ADMIN.toString() && role != UserRoles.EDITOR.toString()){
             throw new UnauthorizedException("You do not have permission to do that.");
         }
 
-        const item = await this.itemModel.findOneAndUpdate({SKU: SKU}, {...dto}, { new: true, runValidators: true } );
+        const item = await this.itemModel.findOne({SKU: SKU});
         if (!item){
             throw new NotFoundException("Item not found.");
         }
+        dto.categories = dto.categories.map(s => new mongoose.Types.ObjectId(s));
+        Object.assign(item,dto);
+        const res = await this.itemModel.updateOne({SKU: SKU}, item);
+
+        //const item = await this.itemModel.find({SKU: SKU}, {...dto}, { new: true, runValidators: true } );
+        
 
         return item;
     }
@@ -125,58 +130,5 @@ export class ItemsService {
     async isAllowed(token: string, expectedRole: string) {
         const role = await this.extractRole(token);
         return role == expectedRole;
-    }
-
-    //TODO: Move functionality to the update method
-    async addCategories(SKU: number, categs: any, header: string) {
-    //     const role = await this.extractRole(header);
-    //     if( role != UserRoles.ADMIN.toString() && role != UserRoles.EDITOR.toString()){
-    //         throw new UnauthorizedException("You do not have permission to do that.");
-    //     }
-
-    //     let item = await this.itemModel.findOne({SKU: SKU});
-
-    //     if(!item){
-    //         return new NotFoundException("Item not found.");
-    //     }
-
-    //    let  catgs = categs.map(s => new mongoose.Types.ObjectId(s));
-
-    //     // Aggregation to check if the categories being added exist in the categories collection
-    //     const existingCategs: ObjectId[] = await this.categoryModel.aggregate([
-    //         {
-    //             $match: {
-    //                 _id: {
-    //                     $in: catgs
-    //                 }
-    //             }
-    //         }
-    //     ])
-
-    //     // Throws an error if not all the categories meant to be added don't exist
-    //     if(existingCategs.length != categs.length){
-    //         throw new NotFoundException("Not all of these categories exist.");
-    //     }
-
-         
-    // //    let  res = await item.findOneAndUpdate(
-    // //         {SKU: SKU},
-    // //         {$addToSet: {categories: {$each: catgs}}}
-    // //     )
-
-    //      await item.updateOne({categories: categs})
-
-    //     // console.log(item, res, 'result')
-
-    //     return item;
-
-    }
-
-    //TODO:
-    async editCategories(SKU: number, dto: UpdateCategoryDto, header: string) {
-        if (!this.isAllowed(header, UserRoles.ADMIN.toString())){
-            throw new UnauthorizedException("You do not have permission to do that.");
-        }
-
     }
 }
