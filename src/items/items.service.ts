@@ -9,6 +9,7 @@ import { UpdateCategoryDto } from 'src/categories/dtos/update-category.dto';
 import { CategoriesService } from 'src/categories/categories.service';
 import { AddCategoriesDto } from './dtos/add-categories.dto';
 import { QueryResult } from 'typeorm';
+import { EditItemDto } from './dtos/edit-item.dto';
 
 @Injectable()
 export class ItemsService {
@@ -81,13 +82,14 @@ export class ItemsService {
 
     }
 
-    async update(SKU: number, attrs: Partial<Item> , header: string) {
+    //TODO: Add functionality for adding categories
+    async update(SKU: number, dto: EditItemDto , header: string) {
         const role = await this.extractRole(header);
         if( role != UserRoles.ADMIN.toString() && role != UserRoles.EDITOR.toString()){
             throw new UnauthorizedException("You do not have permission to do that.");
         }
 
-        const item = await this.itemModel.findOneAndUpdate({SKU: SKU}, {name: attrs.name, image: attrs.image, description: attrs.description}, { new: true, runValidators: true } );
+        const item = await this.itemModel.findOneAndUpdate({SKU: SKU}, {...dto}, { new: true, runValidators: true } );
         if (!item){
             throw new NotFoundException("Item not found.");
         }
@@ -125,43 +127,48 @@ export class ItemsService {
         return role == expectedRole;
     }
 
-    //TODO:
+    //TODO: Move functionality to the update method
     async addCategories(SKU: number, categs: any, header: string) {
-        const role = await this.extractRole(header);
-        if( role != UserRoles.ADMIN.toString() && role != UserRoles.EDITOR.toString()){
-            throw new UnauthorizedException("You do not have permission to do that.");
-        }
+    //     const role = await this.extractRole(header);
+    //     if( role != UserRoles.ADMIN.toString() && role != UserRoles.EDITOR.toString()){
+    //         throw new UnauthorizedException("You do not have permission to do that.");
+    //     }
 
-        let item = await this.itemModel.findOne({SKU: SKU});
+    //     let item = await this.itemModel.findOne({SKU: SKU});
 
-        if(!item){
-            return new NotFoundException("Item not found.");
-        }
+    //     if(!item){
+    //         return new NotFoundException("Item not found.");
+    //     }
 
-        categs = categs.map(s => new mongoose.Types.ObjectId(s));
+    //    let  catgs = categs.map(s => new mongoose.Types.ObjectId(s));
 
-        // Aggregation to check if the categories being added exist in the categories collection
-        const existingCategs: ObjectId[] = await this.categoryModel.aggregate([
-            {
-                $match: {
-                    _id: {
-                        $in: categs
-                    }
-                }
-            }
-        ])
+    //     // Aggregation to check if the categories being added exist in the categories collection
+    //     const existingCategs: ObjectId[] = await this.categoryModel.aggregate([
+    //         {
+    //             $match: {
+    //                 _id: {
+    //                     $in: catgs
+    //                 }
+    //             }
+    //         }
+    //     ])
 
-        // Throws an error if not all the categories meant to be added don't exist
-        if(existingCategs.length != categs.length){
-            throw new NotFoundException("Not all of these categories exist.");
-        }
+    //     // Throws an error if not all the categories meant to be added don't exist
+    //     if(existingCategs.length != categs.length){
+    //         throw new NotFoundException("Not all of these categories exist.");
+    //     }
 
-        item = await this.itemModel.findOneAndUpdate(
-            {SKU: SKU},
-            {$addToSet: {categories: {$each: categs}}}
-        )
+         
+    // //    let  res = await item.findOneAndUpdate(
+    // //         {SKU: SKU},
+    // //         {$addToSet: {categories: {$each: catgs}}}
+    // //     )
 
-        return item;
+    //      await item.updateOne({categories: categs})
+
+    //     // console.log(item, res, 'result')
+
+    //     return item;
 
     }
 
