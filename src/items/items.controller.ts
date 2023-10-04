@@ -27,7 +27,7 @@ export class ItemsController {
     @Post('upload/:sku')
     @UseInterceptors(FileInterceptor('image', {
         storage: diskStorage({
-          destination: './misc'
+          destination: './images/items'
           , filename: (req, image, cb) => {
             // Generating a 32 random chars long string
             const randomName = Array(32).fill(null).map(() => (Math.round(Math.random() * 16)).toString(16)).join('')

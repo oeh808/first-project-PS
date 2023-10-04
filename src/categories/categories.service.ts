@@ -57,6 +57,16 @@ export class CategoriesService {
         return category;
     }
 
+    async uploadImage(name: string, image: Express.Multer.File, header: string) {
+        if(! await this.isAllowed(header, UserRoles.ADMIN.toString())){
+            throw new UnauthorizedException("You do not have permission to do that.");
+        }
+
+        const category = await this.categoryModel.findOneAndUpdate({name: name}, {image: image.filename}, {new: true});
+
+        return category;
+    }
+
     // --- DELETE ---
     async remove(name: string, header: string) {
         if(! await this.isAllowed(header, UserRoles.ADMIN.toString())){
