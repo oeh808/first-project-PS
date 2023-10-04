@@ -89,7 +89,7 @@ export class UsersService {
             throw new UnauthorizedException("You do not have permission to do that.");
         }
 
-        const user = await this.userModel.findOneAndUpdate({userID: id}, {name: attrs.name, email: attrs.email}, {new: true, runValidators: true});
+        const user = await this.userModel.findOneAndUpdate({userID: id}, {...attrs}, {new: true, runValidators: true});
 
         if (!user){
             return new NotFoundException("User not found");
