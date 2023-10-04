@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Session, Get, Patch, Delete, Param, Query, UseGuards, Headers } from '@nestjs/common';
+import { Body, Controller, Post, Session, Get, Patch, Delete, Param, Query, UseGuards, Headers, BadRequestException } from '@nestjs/common';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UsersService } from './users.service';
 import { SearchUserDto } from './dtos/search-user.dto';
@@ -14,13 +14,14 @@ import { Public } from 'src/decorators/public.decorator';
 export class UsersController {
     constructor (private usersService: UsersService, private authService: AuthService) {}
     // --- Super Admin ---
-    //FIXME: Implement a way of authorizing the user before creation
     @Post()
-    async createUser(@Body() body: CreateUserDto, @Headers('authorization') header: string) {
-        // const user = await this.usersService.create(body.userID,body.name,body.email,body.password);
-
-        // return user; 
-        return this.authService.signUp(body.userID,body.name,body.email,body.password, header);
+    async createUser(@Body() body: CreateUserDto, @Headers('authorization') header: string) { 
+        try {
+            return await this.authService.signUp(body.userID,body.name,body.email,body.password, header);
+        }catch(error){
+            throw new BadRequestException(`User with ID: ${body.userID} already exists.`);
+        }
+        
     }
 
     @Public() 

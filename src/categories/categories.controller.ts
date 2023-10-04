@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Session, Get, Patch, Delete, Param, Query, Headers, UseInterceptors, HttpException, HttpStatus, UploadedFile } from '@nestjs/common';
+import { Body, Controller, Post, Session, Get, Patch, Delete, Param, Query, Headers, UseInterceptors, HttpException, HttpStatus, UploadedFile, BadRequestException } from '@nestjs/common';
 import { CategoriesService } from './categories.service';
 import { CreateCategoryDto } from './dtos/create-category.dto';
 import { SearchCategoryDto } from './dtos/search-category.dto';
@@ -13,9 +13,11 @@ export class CategoriesController {
 
     @Post()
     async createCategory(@Body() body: CreateCategoryDto, @Headers('authorization') header: string) {
-        const category = await this.categoryService.create({...body}, header);
-
-        return category;
+        try {
+            return await this.categoryService.create({...body}, header);
+        }catch(error){
+            throw new BadRequestException(`Category with name: ${body.name} already exists.`);
+        }
     }
 
     @Post('upload/:name')
