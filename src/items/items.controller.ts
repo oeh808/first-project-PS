@@ -7,7 +7,6 @@ import { SearchItemDto } from './dtos/search-item.dto';
 import { AddCategoriesDto } from './dtos/add-categories.dto';
 import { FormDataRequest } from 'nestjs-form-data';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { UploadItemImageDto } from './dtos/upload-item-image.dto';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 
