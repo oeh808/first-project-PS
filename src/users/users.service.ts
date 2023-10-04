@@ -120,6 +120,6 @@ export class UsersService {
     // --- Function that checks if the user is a superadmin given a token
     async isAllowed(token: string) {
         const role = await this.extractRole(token);
-        return role == UserRoles.SUPERADMIN.toString();
+        return role == UserRoles.SUPER_ADMIN.toString();
     }
 }
