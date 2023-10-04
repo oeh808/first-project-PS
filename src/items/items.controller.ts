@@ -25,7 +25,7 @@ export class ItemsController {
         }
     }
 
-    @Post('upload')
+    @Post('upload/:sku')
     @UseInterceptors(FileInterceptor('image', {
         storage: diskStorage({
           destination: './misc'
@@ -44,9 +44,9 @@ export class ItemsController {
             }
         }
       }))
-    uploadFile(@UploadedFile() image: Express.Multer.File) {
-      console.log(image);
-      return image;
+    uploadFile(@Param('sku') SKU: string, @UploadedFile() image: Express.Multer.File, @Headers('authorization') header: string) {
+
+      return this.itemService.uploadImage(parseInt(SKU), image, header);
     }
 
     @Get('/:sku')

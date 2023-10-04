@@ -10,7 +10,7 @@ export class Item {
     @Prop({ required: [true, "Item must have a name."], trim: true })
     name: string;
     
-    @Prop({ required: [true, "Item must have an image"], trim: true  })
+    @Prop({ default: "Default.jpg", trim: true  })
     image: string;
 
     @Prop({ required: [true, "Item must have a description."], trim: true })

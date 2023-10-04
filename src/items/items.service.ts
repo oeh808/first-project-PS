@@ -121,6 +121,17 @@ export class ItemsService {
         return item;
     }
 
+    async uploadImage(SKU: number, image: Express.Multer.File, header: string) {
+        const role = await this.extractRole(header);
+        if( role != UserRoles.ADMIN.toString() && role != UserRoles.EDITOR.toString()){
+            throw new UnauthorizedException("You do not have permission to do that.");
+        }
+
+        const item = await this.itemModel.findOneAndUpdate({SKU: SKU}, {image: image.filename}, {returnDocument: "after"});
+
+        return item;
+    }
+
     async extractRole(token: string) {
         //console.log(token);
         const temp = atob(token.split('.')[1]);

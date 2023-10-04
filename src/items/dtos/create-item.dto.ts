@@ -11,6 +11,7 @@ export class CreateItemDto {
     name: string;
 
     @IsString()
+    @IsOptional()
     image: string;
 
     @IsString()
