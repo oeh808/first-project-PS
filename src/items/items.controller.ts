@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Session, Get, Patch, Delete, Param, Query, UseGuards, Headers, BadRequestException, UseInterceptors, UploadedFile } from '@nestjs/common';
+import { Body, Controller, Post, Session, Get, Patch, Delete, Param, Query, UseGuards, Headers, BadRequestException, UseInterceptors, UploadedFile, HttpException, HttpStatus } from '@nestjs/common';
 import { ItemsService } from './items.service';
 import { CategoriesService } from 'src/categories/categories.service';
 import { CreateItemDto } from './dtos/create-item.dto';
@@ -30,13 +30,19 @@ export class ItemsController {
         storage: diskStorage({
           destination: './misc'
           , filename: (req, image, cb) => {
-            cb(null, image.originalname)
             // Generating a 32 random chars long string
-            // const randomName = Array(32).fill(null).map(() => (Math.round(Math.random() * 16)).toString(16)).join('')
+            const randomName = Array(32).fill(null).map(() => (Math.round(Math.random() * 16)).toString(16)).join('')
             //Calling the callback passing the random name generated with the original extension name
-            // cb(null, `${randomName}${extname(image.originalname)}`)
+            cb(null, `${randomName}${extname(image.originalname)}`)
           }
-        })
+        }),
+        fileFilter: (req, file, cb) => {
+            if (file.mimetype.startsWith('image')) {
+                cb(null, true);
+            }else {
+                cb(new HttpException(`Unsupported file type ${extname(file.originalname)}`, HttpStatus.BAD_REQUEST), false);
+            }
+        }
       }))
     uploadFile(@UploadedFile() image: Express.Multer.File) {
       console.log(image);
