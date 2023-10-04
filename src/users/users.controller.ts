@@ -17,7 +17,7 @@ export class UsersController {
     @Post()
     async createUser(@Body() body: CreateUserDto, @Headers('authorization') header: string) { 
         try {
-            return await this.authService.signUp(body.userID,body.name,body.email,body.password, header);
+            return await this.authService.signUp(body, header);
         }catch(error){
             throw new BadRequestException(`User with ID: ${body.userID} already exists.`);
         }

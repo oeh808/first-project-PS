@@ -3,15 +3,16 @@ import { JwtService } from '@nestjs/jwt';
 import { UsersService } from './users.service';
 import { randomBytes, scrypt as _scrypt } from 'crypto';
 import { promisify } from 'util';
+import { CreateUserDto } from './dtos/create-user.dto';
 const scrypt = promisify(_scrypt);
 
 @Injectable()
 export class AuthService {
     constructor(private jwtService: JwtService, private usersService: UsersService) {}
 
-    async signUp(userID: number, name: string, email: string, password: string, header: string) {
-        const user = await this.usersService.create(userID, name, email, password, header);
-        const token = await this.jwtService.signAsync({ id: user.userID, role: user.role });
+    async signUp(dto: CreateUserDto, header: string) {
+        const user = await this.usersService.create(dto, header);
+        const token = await this.jwtService.signAsync({ id: user.userID, role: user.role, name: user.name, email: user.email });
         // console.log(token);
 
         return [user, token];
@@ -31,7 +32,7 @@ export class AuthService {
             throw new BadRequestException("Incorrect Email or Password")
         }
 
-        const token = await this.jwtService.signAsync({ id: user.userID, role: user.role  });
+        const token = await this.jwtService.signAsync({ id: user.userID, role: user.role, name: user.name, email: user.email });
 
         return token;
     }

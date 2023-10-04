@@ -7,6 +7,7 @@ import { promisify } from 'util';
 const scrypt = promisify(_scrypt);
 import { UserRoles } from './user-roles.enum';
 import { SearchUserDto } from './dtos/search-user.dto';
+import { CreateUserDto } from './dtos/create-user.dto';
 
 //TODO: Add error handling ----------------------------------------------------------------------------------------------------------------
 @Injectable()
@@ -14,16 +15,16 @@ export class UsersService {
     constructor(@InjectModel(User.name) private userModel: Model<User>) {}
 
     // --- CREATE ---
-    async create(userID : number,name: string, email: string, password: string, header: string) {
+    async create(dto: CreateUserDto, header: string) {
         if (! await this.isAllowed(header)){
             throw new UnauthorizedException("You do not have permission to do that.");
         }
 
         const salt = randomBytes(8).toString('hex');
-        const hash = (await scrypt(password, salt, 32)) as Buffer;
-        password = salt + '.' + hash.toString('hex');
+        const hash = (await scrypt(dto.password, salt, 32)) as Buffer;
+        dto.password = salt + '.' + hash.toString('hex');
 
-        const user = new this.userModel({userID, name, email, password});
+        const user = new this.userModel({...dto});
     
         return user.save();
     }
