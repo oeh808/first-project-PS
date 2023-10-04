@@ -6,6 +6,7 @@ import { randomBytes, scrypt as _scrypt } from 'crypto';
 import { promisify } from 'util';
 const scrypt = promisify(_scrypt);
 import { UserRoles } from './user-roles.enum';
+import { SearchUserDto } from './dtos/search-user.dto';
 
 //TODO: Add error handling ----------------------------------------------------------------------------------------------------------------
 @Injectable()
@@ -48,13 +49,36 @@ export class UsersService {
     }
 
     // --- GET ---
-    async find(name: string, offset: number, limit: number, header: string) {
+    async find(dto: SearchUserDto, header: string) {
         if (! await this.isAllowed(header)){
             throw new UnauthorizedException("You do not have permission to do that.");
         }
 
         // Error handling for user not found unnecessary here due to returning an array
-        return this.userModel.find({ "name" : { $regex: name, $options: 'i' } }).skip(offset).limit(limit);
+        const queryOptions = {
+            name : "",
+            email : ""
+        }
+
+        Object.assign(queryOptions, dto)
+        //console.log(queryOptions);
+
+        // Filters the search by name and email
+        const query = this.userModel.find({ "name" : { $regex: queryOptions.name, $options: 'i' }, "email" :  { $regex: queryOptions.email, $options: 'i' }});
+
+        // Use offset if applicable
+        if(dto.offset){
+            query.skip(dto.offset);
+        }
+
+        // Use limit if applicable
+        if(dto.limit){
+            query.limit(dto.limit);
+        }
+
+
+        const res = await query;
+        return res;
     }
 
     // --- UPDATE ---
@@ -113,7 +137,7 @@ export class UsersService {
         //console.log(token);
         const temp = atob(token.split('.')[1]);
         const role = temp.split(',')[1].split(':')[1];
-        console.log(temp);
+        //console.log(temp);
 
         return role;
     }

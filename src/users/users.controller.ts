@@ -40,7 +40,7 @@ export class UsersController {
     //FIXME: Implement search through email as well
     @Get()
     getAllUsers(@Body() body: SearchUserDto, @Headers('authorization') header: string) {
-        return this.usersService.find(body.name,body.offset,body.limit, header);
+        return this.usersService.find(body, header);
     }
 
     @Patch('/:id')

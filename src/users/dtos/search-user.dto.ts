@@ -1,21 +1,19 @@
 import { IsEmail, IsString, IsOptional, IsNumber } from "class-validator";
 
-export class SearchUserDto {
-    @IsNumber()
-    @IsOptional()
-    userID: number;
-    
+export class SearchUserDto {    
     @IsString()
     @IsOptional()
     name: string;
 
-    @IsEmail()
+    @IsString()
     @IsOptional()
     email: string;
 
     @IsNumber()
+    @IsOptional()
     offset: number;
 
     @IsNumber()
+    @IsOptional()
     limit: number;
 }
