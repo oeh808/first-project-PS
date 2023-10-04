@@ -8,6 +8,7 @@ const scrypt = promisify(_scrypt);
 import { UserRoles } from './user-roles.enum';
 import { SearchUserDto } from './dtos/search-user.dto';
 import { CreateUserDto } from './dtos/create-user.dto';
+import { EditUserDto } from './dtos/update-user.dto';
 
 //TODO: Add error handling ----------------------------------------------------------------------------------------------------------------
 @Injectable()
@@ -84,7 +85,7 @@ export class UsersService {
 
     // --- UPDATE ---
     // Updates any part of the user except the password
-    async update(id: number, attrs: Partial<User>, header: string) {
+    async update(id: number, attrs: Partial<EditUserDto>, header: string) {
         if (! await this.isAllowed(header)){
             throw new UnauthorizedException("You do not have permission to do that.");
         }
