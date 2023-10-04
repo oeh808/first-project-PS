@@ -112,14 +112,16 @@ export class UsersService {
     async extractRole(token: string) {
         //console.log(token);
         const temp = atob(token.split('.')[1]);
-        const role = temp.split(',')[1].slice(-2).charAt(0)
+        const role = temp.split(',')[1].split(':')[1];
+        console.log(temp);
 
         return role;
     }
 
     // --- Function that checks if the user is a superadmin given a token
     async isAllowed(token: string) {
+        
         const role = await this.extractRole(token);
-        return role == UserRoles.SUPER_ADMIN.toString();
+        return role == ('"' + UserRoles.SUPER_ADMIN.toString() + '"');
     }
 }
