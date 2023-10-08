@@ -1,4 +1,4 @@
-import { IsArray, IsOptional, IsString } from "class-validator";
+import { IsArray, IsNumber, IsOptional, IsString } from "class-validator";
 import { ObjectId } from "mongoose";
 
 
@@ -14,4 +14,12 @@ export class SearchItemDto {
     @IsArray()
     @IsOptional()
     categories: string[];
+
+    @IsNumber()
+    @IsOptional()
+    offset: number;
+
+    @IsNumber()
+    @IsOptional()
+    limit: number;
 }

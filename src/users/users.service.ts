@@ -43,8 +43,6 @@ export class UsersService {
 
     // --- GET ---
     async find(dto: SearchUserDto) {
-
-        // Error handling for user not found unnecessary here due to returning an array
         const queryOptions = {
             name : "",
             email : ""

@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Item } from './items.schema';
-import mongoose, { Model } from 'mongoose';
+import mongoose, { Aggregate, Model, PipelineStage } from 'mongoose';
 import { Category } from 'src/categories/categories.schema';
 import { CreateItemDto } from './dtos/create-item.dto';
 import { CategoriesService } from 'src/categories/categories.service';
@@ -41,34 +41,85 @@ export class ItemsService {
         }
         Object.assign(queryOptions, dto)
 
-        let res;
+        // Always filters by name and description (Default being inclusive regex on the empty string)
+        const stages: PipelineStage[] = [
+            {
+                $match: {
+                    name: { 
+                        $regex: queryOptions.name, $options: 'i' 
+                    },
+                    description: {
+                        $regex: queryOptions.description, $options: 'i' 
+                    }
+                }
+            }
+        ]
 
         // Filters by categories if categories are given
         if(dto.categories){
             const categs = dto.categories.map(s => new mongoose.Types.ObjectId(s));
-            res = await this.itemModel.aggregate([
+            stages.push(
                 {
                     $match: {
                         categories: {
                             $all: categs
                         },
-                        name: { 
-                            $regex: queryOptions.name, $options: 'i' 
-                        },
-                        description: {
-                            $regex: queryOptions.description, $options: 'i' 
-                        }
                     }
-                },
-                {
-                    $sort: {SKU: 1}
                 }
-            ]);
+            )
         }
 
+        // Sort by SKU (Ascending)
+        stages.push(
+            {
+                $sort: {SKU: 1}
+            }
+        )
+
+        // Apply offset to aggregation if offset is given
+        if (dto.offset){
+            stages.push(
+                {
+                    $skip: dto.offset
+                }
+            )
+        }
+
+        // Apply limit to aggregation if limit is given
+        if (dto.limit){
+            stages.push(
+                {
+                    $limit: dto.limit
+                }
+            )
+        }
+
+        const res = this.itemModel.aggregate(stages);
         await this.itemModel.populate(res,{path: 'categories', model: this.categoryModel});
 
         return res;
+
+        // res = await this.itemModel.aggregate([
+            //     {
+            //         $match: {
+            //             categories: {
+            //                 $all: categs
+            //             },
+            //             name: { 
+            //                 $regex: queryOptions.name, $options: 'i' 
+            //             },
+            //             description: {
+            //                 $regex: queryOptions.description, $options: 'i' 
+            //             }
+            //         }
+            //     },
+            //     {
+            //         $skip: queryOptions.offset 
+            //     },
+            //     {
+            //         $sort: {SKU: 1}
+            //     }
+            // ]);
 
     }
 
