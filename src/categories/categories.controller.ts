@@ -46,9 +46,9 @@ export class CategoriesController {
             }
         }
       }))
-    uploadFile(@Param('name') name: string, @UploadedFile() image: Express.Multer.File) {
+    async uploadFile(@Param('name') name: string, @UploadedFile() image: Express.Multer.File) {
       try {
-        return this.categoryService.uploadImage(name, image);
+        return await this.categoryService.uploadImage(name, image);
       }catch(error){
         throw new BadRequestException(error.message);
       }
@@ -57,21 +57,20 @@ export class CategoriesController {
     @UseGuards(JwtAuthGuard)
     @Roles([UserRoles.ADMIN, UserRoles.EDITOR])
     @Get('/:name')
-    getCategory(@Param('name') name: string) {
+    async getCategory(@Param('name') name: string) {
         try {
-            return this.categoryService.findOne(name);
+            return await this.categoryService.findOne(name);
         }catch(error){
             throw new BadRequestException(error.message);
         }
     }
 
-    //FIXME: Use Split operator
     @UseGuards(JwtAuthGuard)
     @Roles([UserRoles.ADMIN, UserRoles.EDITOR])
     @Get()
-    getAllCategories(@Body() body: SearchCategoryDto) {
+    async getAllCategories(@Body() body: SearchCategoryDto) {
         try {
-            return this.categoryService.find({...body});
+            return await this.categoryService.find({...body});
         }catch(error){
             throw new BadRequestException(error.message);
         }
@@ -80,9 +79,9 @@ export class CategoriesController {
     @UseGuards(JwtAuthGuard)
     @Roles([UserRoles.ADMIN])
     @Patch('/:name')
-    editCategory(@Param('name') name: string, @Body() body: UpdateCategoryDto) {
+    async editCategory(@Param('name') name: string, @Body() body: UpdateCategoryDto) {
         try {
-            return this.categoryService.update(name, body);
+            return await this.categoryService.update(name, body);
         }catch(error){
             throw new BadRequestException(error.message);
         }
@@ -91,9 +90,9 @@ export class CategoriesController {
     @UseGuards(JwtAuthGuard)
     @Roles([UserRoles.ADMIN])
     @Delete('/:name')
-    removeCategory(@Param('name') name: string) {
+    async removeCategory(@Param('name') name: string) {
         try {
-            return this.categoryService.remove(name);
+            return await this.categoryService.remove(name);
         }catch(error){
             throw new BadRequestException(error.message);
         }   

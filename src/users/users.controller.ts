@@ -39,9 +39,9 @@ export class UsersController {
     @UseGuards(JwtAuthGuard)
     @Roles([UserRoles.SUPER_ADMIN])
     @Get('/:id')
-    getUser(@Param('id') id: string) {
+    async getUser(@Param('id') id: string) {
         try {
-            return this.usersService.findOne(parseInt(id));
+            return await this.usersService.findOne(parseInt(id));
         }catch(error){
             throw new BadRequestException(error.message);
         }
@@ -51,9 +51,9 @@ export class UsersController {
     @UseGuards(JwtAuthGuard)
     @Roles([UserRoles.SUPER_ADMIN])
     @Get()
-    getAllUsers(@Body() body: SearchUserDto) {
+    async getAllUsers(@Body() body: SearchUserDto) {
         try {
-            return this.usersService.find(body);
+            return await this.usersService.find(body);
         }catch(error){
             throw new BadRequestException(error.message);
         }
@@ -63,9 +63,9 @@ export class UsersController {
     @UseGuards(JwtAuthGuard)
     @Roles([UserRoles.SUPER_ADMIN])
     @Patch('/:id')
-    updateUser(@Param('id') id: string, @Body() body: EditUserDto) {
+    async updateUser(@Param('id') id: string, @Body() body: EditUserDto) {
         try {
-            return this.usersService.update(parseInt(id), body);
+            return await this.usersService.update(parseInt(id), body);
         }catch(error){
             throw new BadRequestException(error.message);
         }
@@ -75,9 +75,9 @@ export class UsersController {
     @UseGuards(JwtAuthGuard)
     @Roles([UserRoles.SUPER_ADMIN])
     @Patch('/reset/:id')
-    resetUserPassword(@Param('id') id: string, @Body() body: ResetUserPasswordDto) {
+    async resetUserPassword(@Param('id') id: string, @Body() body: ResetUserPasswordDto) {
         try {
-            return this.usersService.reset(parseInt(id),body.password);
+            return await this.usersService.reset(parseInt(id),body.password);
         }catch(error){
             throw new BadRequestException(error.message);
         }
@@ -87,9 +87,9 @@ export class UsersController {
     @UseGuards(JwtAuthGuard)
     @Roles([UserRoles.SUPER_ADMIN])
     @Delete('/:id')
-    removeUser(@Param('id') id: string) {
+    async removeUser(@Param('id') id: string) {
         try {
-            return this.usersService.remove(parseInt(id));
+            return await this.usersService.remove(parseInt(id));
         }catch(error){
             throw new BadRequestException(error.message);
         }

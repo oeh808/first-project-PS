@@ -49,9 +49,9 @@ export class ItemsController {
             }
         }
       }))
-    uploadFile(@Param('sku') SKU: string, @UploadedFile() image: Express.Multer.File) {
+      async uploadFile(@Param('sku') SKU: string, @UploadedFile() image: Express.Multer.File) {
       try {
-            return this.itemService.uploadImage(parseInt(SKU), image);
+            return await this.itemService.uploadImage(parseInt(SKU), image);
       }catch(error){
             throw new BadRequestException(error.message);
       }
@@ -60,9 +60,9 @@ export class ItemsController {
     @UseGuards(JwtAuthGuard)
     @Roles([UserRoles.ADMIN, UserRoles.EDITOR])
     @Get('/:sku')
-    getItem(@Param('sku') SKU: string) {
+    async getItem(@Param('sku') SKU: string) {
         try {
-            return this.itemService.findOne(parseInt(SKU));
+            return await this.itemService.findOne(parseInt(SKU));
         }catch(error){
             throw new BadRequestException(error.message);
         }
@@ -71,9 +71,9 @@ export class ItemsController {
     @UseGuards(JwtAuthGuard)
     @Roles([UserRoles.ADMIN, UserRoles.EDITOR])
     @Post('/search')
-    getAllItems(@Body() body: SearchItemDto) {
+    async getAllItems(@Body() body: SearchItemDto) {
         try {
-            return this.itemService.find({...body});
+            return await this.itemService.find({...body});
         }catch(error){
             throw new BadRequestException(error.message);
         }
@@ -82,9 +82,9 @@ export class ItemsController {
     @UseGuards(JwtAuthGuard)
     @Roles([UserRoles.ADMIN, UserRoles.EDITOR])
     @Patch('/:sku')
-    editItem(@Param('sku') SKU: string, @Body() body: EditItemDto) {
+    async editItem(@Param('sku') SKU: string, @Body() body: EditItemDto) {
         try {
-            return this.itemService.update(parseInt(SKU), body);
+            return await this.itemService.update(parseInt(SKU), body);
         }catch(error){
             throw new BadRequestException(error.message);
         }
@@ -93,9 +93,9 @@ export class ItemsController {
     @UseGuards(JwtAuthGuard)
     @Roles([UserRoles.ADMIN])
     @Delete('/:sku')
-    removeItem(@Param('sku') SKU: string) {
+    async removeItem(@Param('sku') SKU: string) {
         try {
-            return this.itemService.delete(parseInt(SKU));
+            return await this.itemService.delete(parseInt(SKU));
         }catch(error){
             throw new BadRequestException(error.message);
         }
