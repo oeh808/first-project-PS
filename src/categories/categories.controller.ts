@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Session, Get, Patch, Delete, Param, Query, Headers, UseInterceptors, HttpException, HttpStatus, UploadedFile, BadRequestException } from '@nestjs/common';
+import { Body, Controller, Post, Session, Get, Patch, Delete, Param, Query, UseInterceptors, HttpException, HttpStatus, UploadedFile, BadRequestException, UseGuards } from '@nestjs/common';
 import { CategoriesService } from './categories.service';
 import { CreateCategoryDto } from './dtos/create-category.dto';
 import { SearchCategoryDto } from './dtos/search-category.dto';
@@ -6,20 +6,27 @@ import { UpdateCategoryDto } from './dtos/update-category.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
+import { UserRoles } from '../users/user-roles.enum';
+import { Roles } from '../decorators/role.decorator';
+import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 
 @Controller('categories')
 export class CategoriesController {
     constructor(private categoryService: CategoriesService) {}
 
+    @UseGuards(JwtAuthGuard)
+    @Roles([UserRoles.ADMIN])
     @Post()
-    async createCategory(@Body() body: CreateCategoryDto, @Headers('authorization') header: string) {
+    async createCategory(@Body() body: CreateCategoryDto) {
         try {
-            return await this.categoryService.create({...body}, header);
+            return await this.categoryService.create({...body});
         }catch(error){
             throw new BadRequestException(error.message);
         }
     }
 
+    @UseGuards(JwtAuthGuard)
+    @Roles([UserRoles.ADMIN])
     @Post('upload/:name')
     @UseInterceptors(FileInterceptor('image', {
         storage: diskStorage({
@@ -39,45 +46,54 @@ export class CategoriesController {
             }
         }
       }))
-    uploadFile(@Param('name') name: string, @UploadedFile() image: Express.Multer.File, @Headers('authorization') header: string) {
+    uploadFile(@Param('name') name: string, @UploadedFile() image: Express.Multer.File) {
       try {
-        return this.categoryService.uploadImage(name, image, header);
+        return this.categoryService.uploadImage(name, image);
       }catch(error){
         throw new BadRequestException(error.message);
       }
     }
 
+    @UseGuards(JwtAuthGuard)
+    @Roles([UserRoles.ADMIN, UserRoles.EDITOR])
     @Get('/:name')
-    getCategory(@Param('name') name: string, @Headers('authorization') header: string) {
+    getCategory(@Param('name') name: string) {
         try {
-            return this.categoryService.findOne(name, header);
+            return this.categoryService.findOne(name);
         }catch(error){
             throw new BadRequestException(error.message);
         }
     }
 
+    //FIXME: Use Split operator
+    @UseGuards(JwtAuthGuard)
+    @Roles([UserRoles.ADMIN, UserRoles.EDITOR])
     @Get()
-    getAllCategories(@Body() body: SearchCategoryDto, @Headers('authorization') header: string) {
+    getAllCategories(@Body() body: SearchCategoryDto) {
         try {
-            return this.categoryService.find(body.name, body.offset, body.limit, header);
+            return this.categoryService.find(body.name, body.offset, body.limit);
         }catch(error){
             throw new BadRequestException(error.message);
         }
     }
 
+    @UseGuards(JwtAuthGuard)
+    @Roles([UserRoles.ADMIN])
     @Patch('/:name')
-    editCategory(@Param('name') name: string, @Body() body: UpdateCategoryDto, @Headers('authorization') header: string) {
+    editCategory(@Param('name') name: string, @Body() body: UpdateCategoryDto) {
         try {
-            return this.categoryService.update(name, body, header);
+            return this.categoryService.update(name, body);
         }catch(error){
             throw new BadRequestException(error.message);
         }
     }
 
+    @UseGuards(JwtAuthGuard)
+    @Roles([UserRoles.ADMIN])
     @Delete('/:name')
-    removeCategory(@Param('name') name: string, @Headers('authorization') header: string) {
+    removeCategory(@Param('name') name: string) {
         try {
-            return this.categoryService.remove(name, header);
+            return this.categoryService.remove(name);
         }catch(error){
             throw new BadRequestException(error.message);
         }   
