@@ -71,7 +71,7 @@ export class CategoriesController {
     @Get()
     getAllCategories(@Body() body: SearchCategoryDto) {
         try {
-            return this.categoryService.find(body.name, body.offset, body.limit);
+            return this.categoryService.find({...body});
         }catch(error){
             throw new BadRequestException(error.message);
         }

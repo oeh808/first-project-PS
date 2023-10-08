@@ -5,6 +5,7 @@ import { Model } from 'mongoose';
 import { UserRoles } from 'src/users/user-roles.enum';
 import { UpdateCategoryDto } from './dtos/update-category.dto';
 import { CreateCategoryDto } from './dtos/create-category.dto';
+import { SearchCategoryDto } from './dtos/search-category.dto';
 
 
 @Injectable()
@@ -28,9 +29,29 @@ export class CategoriesService {
         return category;
     }
     
-    //FIXME: Implement optional parameters and use split operator
-    async find(name: string, offset: number, limit: number) {
-        return this.categoryModel.find({ "name" : { $regex: name, $options: 'i' } }).skip(offset).limit(limit);
+    async find(dto : SearchCategoryDto) {
+        const queryOptions = {
+            name : "",
+            description : ""
+        }
+
+        Object.assign(queryOptions,dto);
+
+        const query = this.categoryModel.find({ "name" : { $regex: queryOptions.name, $options: 'i' }, "description" :  { $regex: queryOptions.description, $options: 'i' }});
+
+        // Use offset if applicable
+        if(dto.offset){
+            query.skip(dto.offset);
+        }
+
+        // Use limit if applicable
+        if(dto.limit){
+            query.limit(dto.limit);
+        }
+
+        const res = await query;
+
+        return res;
     }
 
     // --- UPDATE ---
