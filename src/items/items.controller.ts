@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Session, Get, Patch, Delete, Param, Query, UseGuards, Headers, BadRequestException, UseInterceptors, UploadedFile, HttpException, HttpStatus } from '@nestjs/common';
+import { Body, Controller, Post, Session, Get, Patch, Delete, Param, Query, UseGuards, BadRequestException, UseInterceptors, UploadedFile, HttpException, HttpStatus } from '@nestjs/common';
 import { ItemsService } from './items.service';
 import { CategoriesService } from 'src/categories/categories.service';
 import { CreateItemDto } from './dtos/create-item.dto';
@@ -9,21 +9,28 @@ import { FormDataRequest } from 'nestjs-form-data';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
+import { JwtAuthGuard } from '../guards/jwt-auth.guard';
+import { Roles } from '../decorators/role.decorator';
+import { UserRoles } from '../users/user-roles.enum';
 
 @Controller('items')
 export class ItemsController {
     constructor(private itemService: ItemsService) {}
 
+    @UseGuards(JwtAuthGuard)
+    @Roles([UserRoles.ADMIN, UserRoles.EDITOR])
     @Post()
-    async createItem(@Body() body: CreateItemDto, @Headers('authorization') header: string) {
+    async createItem(@Body() body: CreateItemDto) {
         console.log({...body});
         try {
-            return await this.itemService.create({...body}, header);
+            return await this.itemService.create({...body});
         }catch(error){
             throw new BadRequestException(`Item with SKU: ${body.SKU} already exists.`);
         }
     }
 
+    @UseGuards(JwtAuthGuard)
+    @Roles([UserRoles.ADMIN, UserRoles.EDITOR])
     @Post('upload/:sku')
     @UseInterceptors(FileInterceptor('image', {
         storage: diskStorage({
@@ -43,28 +50,36 @@ export class ItemsController {
             }
         }
       }))
-    uploadFile(@Param('sku') SKU: string, @UploadedFile() image: Express.Multer.File, @Headers('authorization') header: string) {
+    uploadFile(@Param('sku') SKU: string, @UploadedFile() image: Express.Multer.File) {
 
-      return this.itemService.uploadImage(parseInt(SKU), image, header);
+      return this.itemService.uploadImage(parseInt(SKU), image);
     }
 
+    @UseGuards(JwtAuthGuard)
+    @Roles([UserRoles.ADMIN, UserRoles.EDITOR])
     @Get('/:sku')
-    getItem(@Param('sku') SKU: string, @Headers('authorization') header: string) {
-        return this.itemService.findOne(parseInt(SKU), header);
+    getItem(@Param('sku') SKU: string) {
+        return this.itemService.findOne(parseInt(SKU));
     }
 
+    @UseGuards(JwtAuthGuard)
+    @Roles([UserRoles.ADMIN, UserRoles.EDITOR])
     @Post('/search')
-    getAllItems(@Body() body: SearchItemDto, @Headers('authorization') header: string) {
-        return this.itemService.find(body.categories,header);
+    getAllItems(@Body() body: SearchItemDto) {
+        return this.itemService.find(body.categories);
     }
 
+    @UseGuards(JwtAuthGuard)
+    @Roles([UserRoles.ADMIN, UserRoles.EDITOR])
     @Patch('/:sku')
-    editItem(@Param('sku') SKU: string, @Body() body: EditItemDto, @Headers('authorization') header: string) {
-        return this.itemService.update(parseInt(SKU), body, header);
+    editItem(@Param('sku') SKU: string, @Body() body: EditItemDto) {
+        return this.itemService.update(parseInt(SKU), body);
     }
 
+    @UseGuards(JwtAuthGuard)
+    @Roles([UserRoles.ADMIN])
     @Delete('/:sku')
-    removeItem(@Param('sku') SKU: string, @Headers('authorization') header: string) {
-        return this.itemService.delete(parseInt(SKU), header);
+    removeItem(@Param('sku') SKU: string) {
+        return this.itemService.delete(parseInt(SKU));
     }
 }
