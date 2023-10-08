@@ -22,6 +22,8 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     const token = request.rawHeaders[index];
 
     const role = this.extractRole(token);
+    console.log(role);
+    console.log(roles);
 
     return super.canActivate(context) && roles.includes(role); 
   }
@@ -37,7 +39,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
   extractRole(token: string) {
     //console.log(token);
     const temp = atob(token.split('.')[1]);
-    const role = temp.split(',')[1].split(':')[1].slice(1,-1);
+    const role = temp.split(',')[0].split(':')[1].slice(1,-1);
     //console.log(temp);
 
     return role;

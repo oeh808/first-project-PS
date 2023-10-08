@@ -4,6 +4,7 @@ import { UsersService } from './users.service';
 import { randomBytes, scrypt as _scrypt } from 'crypto';
 import { promisify } from 'util';
 import { CreateUserDto } from './dtos/create-user.dto';
+import { UserRoles } from './user-roles.enum';
 const scrypt = promisify(_scrypt);
 
 @Injectable()
@@ -13,7 +14,7 @@ export class AuthService {
     async signUp(dto: CreateUserDto) {
         //const user = await this.usersService.create(dto, header);
         dto.password = await this.hashPassword(dto.password);
-        const token = await this.jwtService.signAsync({...dto});
+        const token = await this.jwtService.signAsync({role: UserRoles.EDITOR , ...dto});
         // console.log(token);
 
         return [dto.password, token];
@@ -34,7 +35,7 @@ export class AuthService {
             throw new UnauthorizedException("Incorrect Email or Password")
         }
 
-        const token = await this.jwtService.signAsync({...user});
+        const token = await this.jwtService.signAsync({role: user.role, userID: user.userID, name: user.name, email: user.email, password: user.password});
 
         return token;
     }
