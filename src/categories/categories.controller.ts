@@ -16,7 +16,7 @@ export class CategoriesController {
         try {
             return await this.categoryService.create({...body}, header);
         }catch(error){
-            throw new BadRequestException(`Category with name: ${body.name} already exists.`);
+            throw new BadRequestException(error.message);
         }
     }
 
@@ -40,27 +40,47 @@ export class CategoriesController {
         }
       }))
     uploadFile(@Param('name') name: string, @UploadedFile() image: Express.Multer.File, @Headers('authorization') header: string) {
-      return this.categoryService.uploadImage(name, image, header);
+      try {
+        return this.categoryService.uploadImage(name, image, header);
+      }catch(error){
+        throw new BadRequestException(error.message);
+      }
     }
 
     @Get('/:name')
     getCategory(@Param('name') name: string, @Headers('authorization') header: string) {
-        return this.categoryService.findOne(name, header);
+        try {
+            return this.categoryService.findOne(name, header);
+        }catch(error){
+            throw new BadRequestException(error.message);
+        }
     }
 
     @Get()
     getAllCategories(@Body() body: SearchCategoryDto, @Headers('authorization') header: string) {
-        return this.categoryService.find(body.name, body.offset, body.limit, header);
+        try {
+            return this.categoryService.find(body.name, body.offset, body.limit, header);
+        }catch(error){
+            throw new BadRequestException(error.message);
+        }
     }
 
     @Patch('/:name')
     editCategory(@Param('name') name: string, @Body() body: UpdateCategoryDto, @Headers('authorization') header: string) {
-        return this.categoryService.update(name, body, header);
+        try {
+            return this.categoryService.update(name, body, header);
+        }catch(error){
+            throw new BadRequestException(error.message);
+        }
     }
 
     @Delete('/:name')
     removeCategory(@Param('name') name: string, @Headers('authorization') header: string) {
-        return this.categoryService.remove(name, header);
+        try {
+            return this.categoryService.remove(name, header);
+        }catch(error){
+            throw new BadRequestException(error.message);
+        }   
     }
 
 }
