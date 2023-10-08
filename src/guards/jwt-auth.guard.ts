@@ -1,6 +1,7 @@
 import { ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { AuthGuard } from '@nestjs/passport';
+import { Roles } from '../decorators/role.decorator';
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
@@ -10,15 +11,35 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
 
   canActivate(context: ExecutionContext) {
     // Add your custom authentication logic here
-    // for example, call super.logIn(request) to establish a session.
-    return super.canActivate(context);
+    const roles = this.reflector.get(Roles, context.getHandler());
+    if (!roles) {
+      return true;
+    }
+
+    const request = context.switchToHttp().getRequest();
+    
+    const index = request.rawHeaders.indexOf("Authorization")+1;
+    const token = request.rawHeaders[index];
+
+    const role = this.extractRole(token);
+
+    return super.canActivate(context) && roles.includes(role); 
   }
 
   handleRequest(err, user, info) {
     // You can throw an exception based on either "info" or "err" arguments
     if (err || !user) {
-      throw err || new UnauthorizedException();
+      return err || new UnauthorizedException(); 
     }
     return user;
   }
+
+  extractRole(token: string) {
+    //console.log(token);
+    const temp = atob(token.split('.')[1]);
+    const role = temp.split(',')[1].split(':')[1].slice(1,-1);
+    //console.log(temp);
+
+    return role;
+}
 }

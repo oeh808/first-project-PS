@@ -133,9 +133,8 @@ export class ItemsService {
     }
 
     async extractRole(token: string) {
-        //console.log(token);
         const temp = atob(token.split('.')[1]);
-        const role = temp.split(',')[1].slice(-2).charAt(0)
+        const role = temp.split(',')[1].split(':')[1];
 
         return role;
     }
@@ -143,6 +142,6 @@ export class ItemsService {
     // --- Function that checks if the user is a given role
     async isAllowed(token: string, expectedRole: string) {
         const role = await this.extractRole(token);
-        return role == expectedRole;
+        return role == ('"' + expectedRole.toString() + '"');
     }
 }
