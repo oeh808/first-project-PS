@@ -1,4 +1,4 @@
-import { BadRequestException, Inject, Injectable, NotFoundException, forwardRef } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, NotFoundException, UnauthorizedException, forwardRef } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from './users.service';
 import { randomBytes, scrypt as _scrypt } from 'crypto';
@@ -22,15 +22,16 @@ export class AuthService {
     async signIn(email: string, password: string) {
         const user = await this.usersService.findOneByEmail(email).select("+password");
         if (!user){
-            return new BadRequestException("Incorrect Email or Password")
+            return new UnauthorizedException("Incorrect Email or Password")
         }
 
+        // Decrypting password
         const [salt, storedHash] = user.password.split('.');
-
         const hash = (await scrypt(password, salt, 32)) as Buffer;
 
+        // Comparing password entered by user with stored password
         if (hash.toString('hex') !== storedHash){
-            throw new BadRequestException("Incorrect Email or Password")
+            throw new UnauthorizedException("Incorrect Email or Password")
         }
 
         const token = await this.jwtService.signAsync({...user});
