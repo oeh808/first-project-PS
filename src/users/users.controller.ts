@@ -18,9 +18,9 @@ export class UsersController {
     @UseGuards(JwtAuthGuard)
     @Roles([UserRoles.SUPER_ADMIN])
     @Post()
-    async createUser(@Body() body: CreateUserDto, @Headers('authorization') header: string) { 
+    async createUser(@Body() body: CreateUserDto) { 
         try {
-            return await this.authService.signUp(body, header);
+            return await this.usersService.create(body);
         }catch(error){
             throw new BadRequestException(`User with ID: ${body.userID} already exists.`);
         }
@@ -37,36 +37,36 @@ export class UsersController {
     @UseGuards(JwtAuthGuard)
     @Roles([UserRoles.SUPER_ADMIN])
     @Get('/:id')
-    getUser(@Param('id') id: string, @Headers('authorization') header: string) {
-        return this.usersService.findOne(parseInt(id), header);
+    getUser(@Param('id') id: string) {
+        return this.usersService.findOne(parseInt(id));
     }
 
     @UseGuards(JwtAuthGuard)
     @Roles([UserRoles.SUPER_ADMIN])
     @Get()
-    getAllUsers(@Body() body: SearchUserDto, @Headers('authorization') header: string) {
-        return this.usersService.find(body, header);
+    getAllUsers(@Body() body: SearchUserDto) {
+        return this.usersService.find(body);
     }
 
     @UseGuards(JwtAuthGuard)
     @Roles([UserRoles.SUPER_ADMIN])
     @Patch('/:id')
-    updateUser(@Param('id') id: string, @Body() body: EditUserDto, @Headers('authorization') header: string) {
-        return this.usersService.update(parseInt(id), body, header);
+    updateUser(@Param('id') id: string, @Body() body: EditUserDto) {
+        return this.usersService.update(parseInt(id), body);
     }
 
     @UseGuards(JwtAuthGuard)
     @Roles([UserRoles.SUPER_ADMIN])
     @Patch('/reset/:id')
-    resetUserPassword(@Param('id') id: string, @Body() body: ResetUserPasswordDto, @Headers('authorization') header: string) {
-        return this.usersService.reset(parseInt(id),body.password, header);
+    resetUserPassword(@Param('id') id: string, @Body() body: ResetUserPasswordDto) {
+        return this.usersService.reset(parseInt(id),body.password);
     }
 
     @UseGuards(JwtAuthGuard)
     @Roles([UserRoles.SUPER_ADMIN])
     @Delete('/:id')
-    removeUser(@Param('id') id: string, @Headers('authorization') header: string) {
-        return this.usersService.remove(parseInt(id), header);
+    removeUser(@Param('id') id: string) {
+        return this.usersService.remove(parseInt(id));
     }
 
 }

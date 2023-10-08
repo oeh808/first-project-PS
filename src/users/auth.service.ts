@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, NotFoundException, forwardRef } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from './users.service';
 import { randomBytes, scrypt as _scrypt } from 'crypto';
@@ -8,14 +8,15 @@ const scrypt = promisify(_scrypt);
 
 @Injectable()
 export class AuthService {
-    constructor(private jwtService: JwtService, private usersService: UsersService) {}
+    constructor(private jwtService: JwtService, @Inject(forwardRef(() => UsersService)) private usersService: UsersService) {}
 
-    async signUp(dto: CreateUserDto, header: string) {
-        const user = await this.usersService.create(dto, header);
-        const token = await this.jwtService.signAsync({ id: user.userID, role: user.role, name: user.name, email: user.email });
+    async signUp(dto: CreateUserDto) {
+        //const user = await this.usersService.create(dto, header);
+        dto.password = await this.hashPassword(dto.password);
+        const token = await this.jwtService.signAsync({...dto});
         // console.log(token);
 
-        return [user, token];
+        return [dto.password, token];
     }
 
     async signIn(email: string, password: string) {
@@ -32,9 +33,16 @@ export class AuthService {
             throw new BadRequestException("Incorrect Email or Password")
         }
 
-        const token = await this.jwtService.signAsync({ id: user.userID, role: user.role, name: user.name, email: user.email });
+        const token = await this.jwtService.signAsync({...user});
 
         return token;
+    }
+
+    async hashPassword(password: string){
+        const salt = randomBytes(8).toString('hex');
+        const hash = (await scrypt(password, salt, 32)) as Buffer;
+        password = salt + '.' + hash.toString('hex');
+        return password;
     }
 }
 

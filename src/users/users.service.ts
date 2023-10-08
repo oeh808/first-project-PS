@@ -1,35 +1,32 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException, UnauthorizedException, forwardRef } from '@nestjs/common';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import { User } from './user.schema';
 import { Connection, Model } from 'mongoose';
-import { randomBytes, scrypt as _scrypt } from 'crypto';
-import { promisify } from 'util';
-const scrypt = promisify(_scrypt);
-import { UserRoles } from './user-roles.enum';
 import { SearchUserDto } from './dtos/search-user.dto';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { EditUserDto } from './dtos/update-user.dto';
+import { AuthService } from './auth.service';
 
 //TODO: Add error handling ----------------------------------------------------------------------------------------------------------------
 @Injectable()
 export class UsersService {
-    constructor(@InjectModel(User.name) private userModel: Model<User>) {}
+    
+    constructor(@InjectModel(User.name) private userModel: Model<User>, @Inject(forwardRef(() => AuthService)) private authService: AuthService) {}
 
     // --- CREATE ---
-    async create(dto: CreateUserDto, header: string) {
-
-        const salt = randomBytes(8).toString('hex');
-        const hash = (await scrypt(dto.password, salt, 32)) as Buffer;
-        dto.password = salt + '.' + hash.toString('hex');
+    async create(dto: CreateUserDto) {
+        const [hashedPass, token] = await this.authService.signUp(dto);
+        dto.password = hashedPass;
 
         const user = new this.userModel({...dto});
+        await user.save();
     
-        return user.save();
+        return token;
     }
 
     // Get Single User
     // --- GET ---
-    async findOne(id: number, header: string) {
+    async findOne(id: number) {
 
         const user = await this.userModel.findOne({userID: id});
         if (!user){
@@ -45,7 +42,7 @@ export class UsersService {
     }
 
     // --- GET ---
-    async find(dto: SearchUserDto, header: string) {
+    async find(dto: SearchUserDto) {
 
         // Error handling for user not found unnecessary here due to returning an array
         const queryOptions = {
@@ -76,7 +73,7 @@ export class UsersService {
 
     // --- UPDATE ---
     // Updates any part of the user except the password
-    async update(id: number, attrs: Partial<EditUserDto>, header: string) {
+    async update(id: number, attrs: Partial<EditUserDto>) {
         const user = await this.userModel.findOneAndUpdate({userID: id}, {...attrs}, {new: true, runValidators: true});
 
         if (!user){
@@ -88,10 +85,8 @@ export class UsersService {
     }
 
     // --- UPDATE ---
-    async reset(id: number, password: string, header: string) {
-        const salt = randomBytes(8).toString('hex');
-        const hash = (await scrypt(password, salt, 32)) as Buffer;
-        password = salt + '.' + hash.toString('hex');
+    async reset(id: number, password: string) {
+        password = await this.authService.hashPassword(password);
 
         const user = await this.userModel.findOneAndUpdate({userID: id},{password: password}, { new: true, runValidators: true });
 
@@ -103,7 +98,7 @@ export class UsersService {
     }
 
     // --- DELETE ---
-    async remove(id: number, header: string) {
+    async remove(id: number) {
         const user = await this.userModel.findOneAndDelete({userID: id});
 
         if(!user){
