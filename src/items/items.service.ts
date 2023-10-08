@@ -144,9 +144,9 @@ export class ItemsService {
 
 
     // Only the admin can delete an item
-    delete(SKU: number) {
-        const item = this.itemModel.findOneAndDelete({SKU: SKU});
-
+    async delete(SKU: number) {
+        const item = await this.itemModel.findOneAndDelete({SKU: SKU});
+        
         if (!item){
             throw new NotFoundException("Item not found.")
         }
