@@ -56,9 +56,10 @@ export class CategoriesService {
 
     // --- UPDATE ---
     //FIXME: Implement optional parameters and use split operator
-    async update(name: string, attrs: UpdateCategoryDto) {
+    async update(name: string, dto: Partial<UpdateCategoryDto>) {
 
-        const category = await this.categoryModel.findOneAndUpdate({name: name}, {image: attrs.image, description: attrs.description}, { new: true, runValidators: true } );
+        const category = await this.categoryModel.findOneAndUpdate({name: name}, {...dto}, { new: true, runValidators: true } );
+
         if(!category){
             return new NotFoundException("Category not found.");
         }
