@@ -21,7 +21,6 @@ export class ItemsController {
     @Roles([UserRoles.ADMIN, UserRoles.EDITOR])
     @Post()
     async createItem(@Body() body: CreateItemDto) {
-        console.log({...body});
         try {
             return await this.itemService.create({...body});
         }catch(error){
@@ -66,7 +65,7 @@ export class ItemsController {
     @Roles([UserRoles.ADMIN, UserRoles.EDITOR])
     @Post('/search')
     getAllItems(@Body() body: SearchItemDto) {
-        return this.itemService.find(body.categories);
+        return this.itemService.find({...body});
     }
 
     @UseGuards(JwtAuthGuard)

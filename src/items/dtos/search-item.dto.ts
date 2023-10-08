@@ -1,8 +1,17 @@
-import { IsArray } from "class-validator";
+import { IsArray, IsOptional, IsString } from "class-validator";
 import { ObjectId } from "mongoose";
 
 
 export class SearchItemDto {
+    @IsString()
+    @IsOptional()
+    name: string;
+
+    @IsString()
+    @IsOptional()
+    description: string;
+
     @IsArray()
-    categories: ObjectId[];
+    @IsOptional()
+    categories: string[];
 }

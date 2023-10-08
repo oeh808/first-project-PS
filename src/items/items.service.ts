@@ -1,15 +1,12 @@
 import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Item } from './items.schema';
-import mongoose, { Model, ObjectId } from 'mongoose';
-import { UserRoles } from 'src/users/user-roles.enum';
+import mongoose, { Model } from 'mongoose';
 import { Category } from 'src/categories/categories.schema';
 import { CreateItemDto } from './dtos/create-item.dto';
-import { UpdateCategoryDto } from 'src/categories/dtos/update-category.dto';
 import { CategoriesService } from 'src/categories/categories.service';
-import { AddCategoriesDto } from './dtos/add-categories.dto';
-import { QueryResult } from 'typeorm';
 import { EditItemDto } from './dtos/edit-item.dto';
+import { SearchItemDto } from './dtos/search-item.dto';
 
 @Injectable()
 export class ItemsService {
@@ -37,36 +34,41 @@ export class ItemsService {
         return item;
     }
 
-    async find(categs: any[]) {
-        // Assume front end will send the object id for category filtering
-        categs = categs.map(s => new mongoose.Types.ObjectId(s));
+    async find(dto: SearchItemDto) {
+        const queryOptions = {
+            name : "",
+            description : ""
+        }
+        Object.assign(queryOptions, dto)
 
-        const test = await this.itemModel.aggregate([
-            // {
-            //     $unwind: "$categories"
-            // },
-            {
-                $match: {
-                    categories: {
-                        $all: categs
+        let res;
+
+        // Filters by categories if categories are given
+        if(dto.categories){
+            const categs = dto.categories.map(s => new mongoose.Types.ObjectId(s));
+            res = await this.itemModel.aggregate([
+                {
+                    $match: {
+                        categories: {
+                            $all: categs
+                        },
+                        name: { 
+                            $regex: queryOptions.name, $options: 'i' 
+                        },
+                        description: {
+                            $regex: queryOptions.description, $options: 'i' 
+                        }
                     }
+                },
+                {
+                    $sort: {SKU: 1}
                 }
-            },
-            {
-                $sort: {SKU: 1}
-            }
-            // {
-            //     $lookup: {
-            //         from: "categories",
-            //         foreignField: "_id",
-            //         as: ""
-            //     }
-            // }
-        ]);
+            ]);
+        }
 
-        await this.itemModel.populate(test,{path: 'categories', model: this.categoryModel});
+        await this.itemModel.populate(res,{path: 'categories', model: this.categoryModel});
 
-        return test;
+        return res;
 
     }
 
@@ -75,9 +77,13 @@ export class ItemsService {
         if (!item){
             throw new NotFoundException("Item not found.");
         }
-        dto.categories = dto.categories.map(s => new mongoose.Types.ObjectId(s));
+
+        if(dto.categories){
+            dto.categories = dto.categories.map(s => new mongoose.Types.ObjectId(s));
+        }
+
         Object.assign(item,dto);
-        const res = await this.itemModel.updateOne({SKU: SKU}, item);
+        await this.itemModel.updateOne({SKU: SKU}, item);
 
         //const item = await this.itemModel.find({SKU: SKU}, {...dto}, { new: true, runValidators: true } );
         
