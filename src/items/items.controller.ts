@@ -24,7 +24,7 @@ export class ItemsController {
         try {
             return await this.itemService.create({...body});
         }catch(error){
-            throw new BadRequestException(`Item with SKU: ${body.SKU} already exists.`);
+            throw new BadRequestException(error.message);
         }
     }
 
@@ -50,35 +50,54 @@ export class ItemsController {
         }
       }))
     uploadFile(@Param('sku') SKU: string, @UploadedFile() image: Express.Multer.File) {
-
-      return this.itemService.uploadImage(parseInt(SKU), image);
+      try {
+            return this.itemService.uploadImage(parseInt(SKU), image);
+      }catch(error){
+            throw new BadRequestException(error.message);
+      }
     }
 
     @UseGuards(JwtAuthGuard)
     @Roles([UserRoles.ADMIN, UserRoles.EDITOR])
     @Get('/:sku')
     getItem(@Param('sku') SKU: string) {
-        return this.itemService.findOne(parseInt(SKU));
+        try {
+            return this.itemService.findOne(parseInt(SKU));
+        }catch(error){
+            throw new BadRequestException(error.message);
+        }
     }
 
     @UseGuards(JwtAuthGuard)
     @Roles([UserRoles.ADMIN, UserRoles.EDITOR])
     @Post('/search')
     getAllItems(@Body() body: SearchItemDto) {
-        return this.itemService.find({...body});
+        try {
+            return this.itemService.find({...body});
+        }catch(error){
+            throw new BadRequestException(error.message);
+        }
     }
 
     @UseGuards(JwtAuthGuard)
     @Roles([UserRoles.ADMIN, UserRoles.EDITOR])
     @Patch('/:sku')
     editItem(@Param('sku') SKU: string, @Body() body: EditItemDto) {
-        return this.itemService.update(parseInt(SKU), body);
+        try {
+            return this.itemService.update(parseInt(SKU), body);
+        }catch(error){
+            throw new BadRequestException(error.message);
+        }
     }
 
     @UseGuards(JwtAuthGuard)
     @Roles([UserRoles.ADMIN])
     @Delete('/:sku')
     removeItem(@Param('sku') SKU: string) {
-        return this.itemService.delete(parseInt(SKU));
+        try {
+            return this.itemService.delete(parseInt(SKU));
+        }catch(error){
+            throw new BadRequestException(error.message);
+        }
     }
 }
