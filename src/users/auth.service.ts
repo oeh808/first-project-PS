@@ -5,11 +5,12 @@ import { randomBytes, scrypt as _scrypt } from 'crypto';
 import { promisify } from 'util';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UserRoles } from './user-roles.enum';
+import { ConfigService } from '@nestjs/config';
 const scrypt = promisify(_scrypt);
 
 @Injectable()
 export class AuthService {
-    constructor(private jwtService: JwtService, @Inject(forwardRef(() => UsersService)) private usersService: UsersService) {}
+    constructor(private jwtService: JwtService, @Inject(forwardRef(() => UsersService)) private usersService: UsersService, private configService: ConfigService) {}
 
     async signUp(dto: CreateUserDto) {
         //const user = await this.usersService.create(dto, header);
@@ -27,7 +28,10 @@ export class AuthService {
         }
 
         // Decrypting password
-        const [salt, storedHash] = user.password.split('.');
+        //const [salt, storedHash] = user.password.split('.');
+        const salt = this.configService.get<string>("SALT");
+        const storedHash = user.password;
+        
         const hash = (await scrypt(password, salt, 32)) as Buffer;
 
         // Comparing password entered by user with stored password
@@ -41,10 +45,11 @@ export class AuthService {
     }
 
     async hashPassword(password: string){
-        const salt = randomBytes(8).toString('hex');
+        // const salt = randomBytes(8).toString('hex');
+        const salt = this.configService.get<string>("SALT");
         const hash = (await scrypt(password, salt, 32)) as Buffer;
-        password = salt + '.' + hash.toString('hex');
-        return password;
+        //password = salt + '.' + hash.toString('hex');
+        return hash.toString('hex');
     }
 }
 

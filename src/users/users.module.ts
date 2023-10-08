@@ -19,7 +19,9 @@ import { JwtStrategy } from './jwt.strategy';
       signOptions: { expiresIn: '1d' },
     }),
     inject: [ConfigService],
-  }),],
+  }),
+  ConfigModule
+  ],
   controllers: [UsersController],
   providers: [UsersService, AuthService, JwtStrategy]
 })
