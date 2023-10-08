@@ -22,8 +22,8 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     const token = request.rawHeaders[index];
 
     const role = this.extractRole(token);
-    console.log(role);
-    console.log(roles);
+    // console.log(role);
+    // console.log(roles);
 
     return super.canActivate(context) && roles.includes(role); 
   }
