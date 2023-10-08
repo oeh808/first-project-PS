@@ -8,12 +8,12 @@ import { Jwt } from 'jsonwebtoken';
 import { AuthService } from './auth.service';
 import { LoginUserDto } from './dtos/login-user.dto';
 import { JwtAuthGuard } from './jwt-auth.guard';
-import { Public } from 'src/decorators/public.decorator';
 
 @Controller('users')
 export class UsersController {
     constructor (private usersService: UsersService, private authService: AuthService) {}
     // --- Super Admin ---
+    @UseGuards(JwtAuthGuard)
     @Post()
     async createUser(@Body() body: CreateUserDto, @Headers('authorization') header: string) { 
         try {
@@ -24,7 +24,6 @@ export class UsersController {
         
     }
 
-    @Public() 
     @Post('/signin')
     async signIn(@Body() body: LoginUserDto) {
         const user = await this.authService.signIn(body.email, body.password);
@@ -32,26 +31,31 @@ export class UsersController {
         return user;
     }
 
+    @UseGuards(JwtAuthGuard)
     @Get('/:id')
     getUser(@Param('id') id: string, @Headers('authorization') header: string) {
         return this.usersService.findOne(parseInt(id), header);
     }
 
+    @UseGuards(JwtAuthGuard)
     @Get()
     getAllUsers(@Body() body: SearchUserDto, @Headers('authorization') header: string) {
         return this.usersService.find(body, header);
     }
 
+    @UseGuards(JwtAuthGuard)
     @Patch('/:id')
     updateUser(@Param('id') id: string, @Body() body: EditUserDto, @Headers('authorization') header: string) {
         return this.usersService.update(parseInt(id), body, header);
     }
 
+    @UseGuards(JwtAuthGuard)
     @Patch('/reset/:id')
     resetUserPassword(@Param('id') id: string, @Body() body: ResetUserPasswordDto, @Headers('authorization') header: string) {
         return this.usersService.reset(parseInt(id),body.password, header);
     }
 
+    @UseGuards(JwtAuthGuard)
     @Delete('/:id')
     removeUser(@Param('id') id: string, @Headers('authorization') header: string) {
         return this.usersService.remove(parseInt(id), header);

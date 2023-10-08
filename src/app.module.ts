@@ -52,11 +52,7 @@ import { MemoryStoredFile, NestjsFormDataModule } from 'nestjs-form-data';
         whitelist: true,
         transform: true
       })
-    },
-    {
-      provide: APP_GUARD,
-      useClass: JwtAuthGuard,
-    },
+    }
   ],
 })
 export class AppModule {}
