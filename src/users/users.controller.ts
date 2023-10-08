@@ -7,7 +7,7 @@ import { ResetUserPasswordDto } from './dtos/reset-password.dto';
 import { Jwt } from 'jsonwebtoken';
 import { AuthService } from './auth.service';
 import { LoginUserDto } from './dtos/login-user.dto';
-import { JwtAuthGuard } from './jwt-auth.guard';
+import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 
 @Controller('users')
 export class UsersController {

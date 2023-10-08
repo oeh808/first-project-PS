@@ -7,7 +7,7 @@ import { CategoriesModule } from './categories/categories.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService} from '@nestjs/config';
 import { APP_GUARD, APP_PIPE } from '@nestjs/core';
-import { JwtAuthGuard } from './users/jwt-auth.guard';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import 'reflect-metadata';
 import { MulterModule } from '@nestjs/platform-express';
 import { MemoryStoredFile, NestjsFormDataModule } from 'nestjs-form-data';
